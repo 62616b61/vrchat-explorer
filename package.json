@@ -1,5 +1,5 @@
 {
-  "name": "world-service",
+  "name": "vrchat-explorer",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -16,9 +16,12 @@
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.47.0",
+    "@aws-sdk/client-timestream-write": "^3.47.0",
     "@serverless-stack/cli": "0.59.1",
     "@serverless-stack/resources": "0.59.1",
-    "aws-cdk-lib": "2.7.0",
     "vrchat": "^1.6.5"
+  },
+  "devDependencies": {
+    "aws-cdk-lib": "2.7.0"
   }
 }
