@@ -1,6 +1,6 @@
 import { TimestreamWriteClient, WriteRecordsCommand } from "@aws-sdk/client-timestream-write";
 
-const { TIMESTREAM_DATABASE, TIMESTREAM_TABLE } = process.env;
+const { METRICS_DATABASE, METRICS_TABLE } = process.env;
 const client = new TimestreamWriteClient();
 
 function record(dimensions, name, value, timestamp) {
@@ -36,8 +36,8 @@ async function writeToTimestream(world, timestamp) {
   ];
 
   const params = {
-    DatabaseName: TIMESTREAM_DATABASE,
-    TableName: TIMESTREAM_TABLE,
+    DatabaseName: METRICS_DATABASE,
+    TableName: METRICS_TABLE,
     Records: records
   };
 

@@ -1,5 +1,6 @@
 import { Stack, Function, Queue } from "@serverless-stack/resources";
 import { CfnDatabase, CfnTable } from "aws-cdk-lib/aws-timestream";
+import * as IAM from "aws-cdk-lib/aws-iam";
 
 export default class MetricsServiceStack extends Stack {
   constructor(scope, service, props) {
@@ -7,12 +8,44 @@ export default class MetricsServiceStack extends Stack {
 
     const { worldTopic } = props;
 
-    const saveWorldDataLambda = new Function(this, "save-world-data-lambda", {
-      functionName: this.node.root.logicalPrefixedName("metrics-service-save-world-data"),
-      handler: "src/metrics-service/save-world-data.handler",
-      permissions: [worldTopic]
+    // TIMESTREAM DATABASE
+    const timestreamDatabaseName = this.node.root.logicalPrefixedName("metrics-service-metrics");
+    const metricsDatabase = new CfnDatabase(this, 'metrics-service-timestream-database-metrics', {
+      databaseName: timestreamDatabaseName,
     });
 
+    const timestreamTableName = "world-metrics";
+    const worldMetricsTable = new CfnTable(this, 'metrics-service-timestream-table-metrics', {
+      tableName: timestreamTableName,
+      databaseName: timestreamDatabaseName,
+    });
+
+    worldMetricsTable.node.addDependency(metricsDatabase);
+
+    const timestreamDescribeEndpointsPolicyStatement = new IAM.PolicyStatement({
+      actions: ["timestream:DescribeEndpoints"],
+      effect: IAM.Effect.ALLOW,
+      resources: ["*"],
+    });
+
+    const timestreamWriteRecordsPolicyStatement = new IAM.PolicyStatement({
+      actions: ["timestream:WriteRecords"],
+      effect: IAM.Effect.ALLOW,
+      resources: [worldMetricsTable.attrArn],
+    });
+
+    // LAMBDA
+    const saveWorldDataLambda = new Function(this, "metrics-service-save-world-data-lambda", {
+      functionName: this.node.root.logicalPrefixedName("metrics-service-save-world-data"),
+      handler: "src/metrics-service/save-world-data.handler",
+      permissions: [worldTopic, timestreamWriteRecordsPolicyStatement, timestreamDescribeEndpointsPolicyStatement],
+      environment: {
+        METRICS_DATABASE: timestreamDatabaseName,
+        METRICS_TABLE: timestreamTableName,
+      },
+    });
+
+    // QUEUE
     const metricsServiceWorldQueue = new Queue(this, "metrics-service-world-queue", {
       consumer: {
         function: saveWorldDataLambda,
@@ -23,17 +56,5 @@ export default class MetricsServiceStack extends Stack {
     worldTopic.addSubscribers(this, [{
       queue: metricsServiceWorldQueue,
     }]);
-
-    const timestreamDatabaseName = this.node.root.logicalPrefixedName("metrics-service-metrics");
-    const metricsDatabase = new CfnDatabase(this, 'metrics-service-timestream-database-metrics', {
-      databaseName: timestreamDatabaseName,
-    });
-
-    const worldMetricsTable = new CfnTable(this, 'metrics-service-timestream-table-metrics', {
-      tableName: "world-metrics",
-      databaseName: timestreamDatabaseName,
-    });
-
-    worldMetricsTable.node.addDependency(metricsDatabase);
   }
 }
