@@ -2,8 +2,8 @@ name: VRCE Production Deploy
 
 on:
   push:
-    branches: [ $default-branch ]
-
+    branches:
+      - master
 jobs:
   Deploy Serverless Stacks:
     runs-on: ubuntu-latest
