@@ -1,7 +1,7 @@
 import vrchat from 'vrchat'
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 
-const { VRCHAT_USERNAME, VRCHAT_PASSWORD, WORLD_SERVICE_TOPIC } = process.env;
+const { VRCHAT_USERNAME, VRCHAT_PASSWORD, WORLD_TOPIC } = process.env;
 const client = new SNSClient();
 
 function serialize(world) {
@@ -33,7 +33,7 @@ async function publishSNSMessage(message, attributes) {
   const params = {
     Message: JSON.stringify(message),
     MessageAttributes: attributes,
-    TopicArn: WORLD_SERVICE_TOPIC
+    TopicArn: WORLD_TOPIC
   };
 
   const command = new PublishCommand(params);
