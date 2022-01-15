@@ -5,7 +5,7 @@ on:
     branches:
       - master
 jobs:
-  Deploy Serverless Stacks:
+  deploy-serverless-stacks:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
