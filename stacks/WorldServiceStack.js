@@ -1,5 +1,7 @@
 import { Stack, Cron, Function, Topic } from "@serverless-stack/resources";
 
+const { VRCHAT_USERNAME, VRCHAT_PASSWORD } = process.env;
+
 export default class WorldServiceStack extends Stack {
   constructor(scope, service, props) {
     super(scope, service, props);
@@ -12,6 +14,8 @@ export default class WorldServiceStack extends Stack {
       permissions: [worldTopic],
       environment: {
         WORLD_TOPIC: worldTopic.topicArn,
+        VRCHAT_USERNAME,
+        VRCHAT_PASSWORD,
       }
     });
     
