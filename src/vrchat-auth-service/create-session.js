@@ -18,6 +18,8 @@ export async function handler() {
   const authString = cookies.find(x => x.startsWith('auth=')).substring(5);
   const apiKeyString = cookies.find(x => x.startsWith('apiKey=')).substring(7);
 
+  // TODO: clear local cookie jar after saving the session
+  // to prevent errors when executing this function again before new coldstart
   await Session.create({
     username: VRCHAT_USERNAME,
     auth: authString,

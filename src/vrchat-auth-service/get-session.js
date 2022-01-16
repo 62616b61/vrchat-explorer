@@ -2,6 +2,7 @@ import { Session } from './lib/connections/dynamodb/Credentials';
 
 export async function handler() {
   // TODO: rethink and refactor
+  // TODO: handle if there's no sessions
   const sessions = await Session.scan();
 
   // pick random session
