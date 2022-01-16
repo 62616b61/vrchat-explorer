@@ -1,4 +1,4 @@
-import vrchat from 'vrchat'
+import vrchat from 'vrchat';
 import { publish } from '../lib/connections/sns';
 
 const { VRCHAT_USERNAME, VRCHAT_PASSWORD, WORLD_TOPIC } = process.env;
@@ -19,11 +19,11 @@ function serialize(world) {
   };
 
   const attributes = {
-    Timestamp: {
+    timestamp: {
       DataType: 'String',
       StringValue: currentTime,
     },
-    Type: {
+    type: {
       DataType: 'String',
       StringValue: 'world-statistics',
     }

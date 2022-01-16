@@ -51,7 +51,7 @@ export async function handler(event) {
       const body = JSON.parse(record.body)
 
       const world = JSON.parse(body.Message);
-      const timestamp = body.MessageAttributes.Timestamp.Value;
+      const timestamp = body.MessageAttributes.timestamp.Value;
 
       return writeToTimestream(world, timestamp);
     });
