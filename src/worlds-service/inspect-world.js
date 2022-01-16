@@ -1,7 +1,8 @@
 import vrchat from 'vrchat';
 import { publish } from '../lib/connections/sns';
+import { initializeVRChatSession } from '../lib/vrchat-session-helper';
 
-const { VRCHAT_USERNAME, VRCHAT_PASSWORD, WORLD_TOPIC } = process.env;
+const { WORLD_TOPIC, IS_LOCAL } = process.env;
 
 function serialize(world) {
   const currentTime = Date.now().toString();
@@ -34,21 +35,18 @@ function serialize(world) {
 
 // TODO: get world id from event
 export async function handler(event) {
+  await initializeVRChatSession();
+
   try {
     const worldId = 'wrld_829c1f70-ed07-4dac-ad58-df7152655a09';
-    const configuration = new vrchat.Configuration({
-        username: VRCHAT_USERNAME,
-        password: VRCHAT_PASSWORD,
-    });
-    
-    const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
-    await AuthenticationApi.getCurrentUser();
 
-    const WorldsApi = new vrchat.WorldsApi(configuration);
-    const response = await WorldsApi.getWorld(worldId);
+    const WorldsApi = new vrchat.WorldsApi();
+    const { data } = await WorldsApi.getWorld(worldId);
 
-    const { message, attributes } = serialize(response.data);
-    return publish(WORLD_TOPIC, message, attributes);
+    if (!IS_LOCAL) {
+      const { message, attributes } = serialize(data);
+      return publish(WORLD_TOPIC, message, attributes);
+    }
   } catch (error) {
 
     // TODO: needs great improvements

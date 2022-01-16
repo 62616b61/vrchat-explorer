@@ -1,11 +1,13 @@
 import { Stack, Cron, Function, Table, TableFieldType, Topic } from "@serverless-stack/resources";
 import { RemovalPolicy } from "aws-cdk-lib";
 
-const { VRCHAT_USERNAME, VRCHAT_PASSWORD, IS_LOCAL } = process.env;
+const { IS_LOCAL } = process.env;
 
 export default class WorldsServiceStack extends Stack {
   constructor(scope, service, props) {
     super(scope, service, props);
+
+    const { vrchatAuthApi } = props;
 
     const worldTopic = new Topic(this, "worlds-service-world-topic");
 
@@ -30,11 +32,10 @@ export default class WorldsServiceStack extends Stack {
     const inspectWorldLambda = new Function(this, "worlds-service-inspect-world-lambda", {
       functionName: this.node.root.logicalPrefixedName("worlds-service-inspect-world"),
       handler: "src/worlds-service/inspect-world.handler",
-      permissions: [worldTopic],
+      permissions: [worldTopic, vrchatAuthApi],
       environment: {
+        VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
         WORLD_TOPIC: worldTopic.topicArn,
-        VRCHAT_USERNAME,
-        VRCHAT_PASSWORD,
       }
     });
 
