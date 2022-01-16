@@ -43,6 +43,8 @@ export async function handler(event) {
     const WorldsApi = new vrchat.WorldsApi();
     const { data } = await WorldsApi.getWorld(worldId);
 
+    console.log("DATA", data)
+
     if (!IS_LOCAL) {
       const { message, attributes } = serialize(data);
       return publish(WORLD_TOPIC, message, attributes);
