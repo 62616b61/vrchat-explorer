@@ -1,3 +1,4 @@
+import VRChatAuthServiceStack from "./VRChatAuthServiceStack";
 import WorldsServiceStack from "./WorldsServiceStack";
 import MetricsServiceStack from "./MetricsServiceStack";
 import { Tracing } from "aws-cdk-lib/aws-lambda";
@@ -8,12 +9,12 @@ export default function main(app) {
     runtime: "nodejs14.x",
     memorySize: 128,
     tracing: Tracing.DISABLED,
+    environment: {
+       NODE_OPTIONS: "--enable-source-maps",
+    },
   });
 
-  const worldServiceStack = new WorldsServiceStack(app, "worlds-service");
-
-  new MetricsServiceStack(app, "metrics-service", {
-    worldTopic: worldServiceStack.worldTopic
-  });
-
+  const { vrchatAuthApi } = new VRChatAuthServiceStack(app, "vrchat-auth-service");
+  const { worldTopic } = new WorldsServiceStack(app, "worlds-service", { vrchatAuthApi });
+  const metricsServiceStack = new MetricsServiceStack(app, "metrics-service", { worldTopic });
 }
