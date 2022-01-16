@@ -1,6 +1,7 @@
 import { Stack, Function, Queue } from "@serverless-stack/resources";
 import { CfnDatabase, CfnTable } from "aws-cdk-lib/aws-timestream";
 import * as IAM from "aws-cdk-lib/aws-iam";
+import { SubscriptionFilter } from "aws-cdk-lib/aws-sns";
 
 export default class MetricsServiceStack extends Stack {
   constructor(scope, service, props) {
@@ -55,6 +56,13 @@ export default class MetricsServiceStack extends Stack {
 
     worldTopic.addSubscribers(this, [{
       queue: metricsServiceWorldQueue,
+      subscriberProps: {
+        filterPolicy: {
+          type: SubscriptionFilter.stringFilter({
+            whitelist: ["world-statistics"],
+          }),
+        },
+      }
     }]);
   }
 }

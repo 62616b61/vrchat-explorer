@@ -1,8 +1,7 @@
 import vrchat from 'vrchat'
-import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+import { publish } from '../lib/connections/sns';
 
 const { VRCHAT_USERNAME, VRCHAT_PASSWORD, WORLD_TOPIC } = process.env;
-const client = new SNSClient();
 
 function serialize(world) {
   const currentTime = Date.now().toString();
@@ -23,22 +22,14 @@ function serialize(world) {
     Timestamp: {
       DataType: 'String',
       StringValue: currentTime,
+    },
+    Type: {
+      DataType: 'String',
+      StringValue: 'world-statistics',
     }
   };
 
   return { message, attributes };
-}
-
-async function publishSNSMessage(message, attributes) {
-  const params = {
-    Message: JSON.stringify(message),
-    MessageAttributes: attributes,
-    TopicArn: WORLD_TOPIC
-  };
-
-  const command = new PublishCommand(params);
-
-  return client.send(command);
 }
 
 // TODO: get world id from event
@@ -57,7 +48,7 @@ export async function handler(event) {
     const response = await WorldsApi.getWorld(worldId);
 
     const { message, attributes } = serialize(response.data);
-    await publishSNSMessage(message, attributes);
+    return publish(WORLD_TOPIC, message, attributes);
   } catch (error) {
 
     // TODO: needs great improvements

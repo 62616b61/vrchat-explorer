@@ -1,6 +1,7 @@
 import { Stack, Cron, Function, Table, TableFieldType, Topic } from "@serverless-stack/resources";
+import { RemovalPolicy } from "aws-cdk-lib";
 
-const { VRCHAT_USERNAME, VRCHAT_PASSWORD } = process.env;
+const { VRCHAT_USERNAME, VRCHAT_PASSWORD, IS_LOCAL } = process.env;
 
 export default class WorldsServiceStack extends Stack {
   constructor(scope, service, props) {
@@ -19,11 +20,16 @@ export default class WorldsServiceStack extends Stack {
       globalIndexes: {
         GSI1: { partitionKey: "GSI1PK", sortKey: "GSI1SK" },
       },
+      ...(
+        IS_LOCAL
+          ? { dynamodbTable: { removalPolicy: RemovalPolicy.DESTROY } }
+          : {}
+      ),
     });
 
-    const getWorldDataLambda = new Function(this, "worlds-service-get-world-data-lambda", {
-      functionName: this.node.root.logicalPrefixedName("worlds-service-get-world-data"),
-      handler: "src/worlds-service/get-world-data.handler",
+    const inspectWorldLambda = new Function(this, "worlds-service-inspect-world-lambda", {
+      functionName: this.node.root.logicalPrefixedName("worlds-service-inspect-world"),
+      handler: "src/worlds-service/inspect-world.handler",
       permissions: [worldTopic],
       environment: {
         WORLD_TOPIC: worldTopic.topicArn,
@@ -31,11 +37,13 @@ export default class WorldsServiceStack extends Stack {
         VRCHAT_PASSWORD,
       }
     });
-    
-    new Cron(this, "schedule_1m", {
-      schedule: "rate(1 minute)",
-      job: getWorldDataLambda
-    });
+
+    if (!IS_LOCAL) {
+      new Cron(this, "schedule_inspect_world_1m", {
+        schedule: "rate(1 minute)",
+        job: inspectWorldLambda
+      });
+    }
     
     this.worldTopic = worldTopic;
   }
