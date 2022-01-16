@@ -19,6 +19,7 @@ export async function initializeVRChatSession () {
   }
 
   try { 
+    console.log("RETRIEVING SESSION FROM VRCHAT-AUTH-SERVICE")
     const { data: session } = await axios.get(`${VRCHAT_AUTH_API_URL}/session`);
 
     AuthenticationApi.axios.defaults.jar.setCookieSync(`auth=${session.auth}`, VRCHAT_API_URL);
