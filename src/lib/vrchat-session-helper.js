@@ -21,7 +21,7 @@ export async function initializeVRChatSession () {
 
   try { 
     console.log("RETRIEVING SESSION FROM VRCHAT-AUTH-SERVICE")
-    const { data: session } = await axios.get(`${VRCHAT_AUTH_API_URL}/session`);
+    //const { data: session } = await axios.get(`${VRCHAT_AUTH_API_URL}/session`);
 
     const jar_data = {
       version: 'tough-cookie@4.0.0',
@@ -30,27 +30,27 @@ export async function initializeVRChatSession () {
       cookies: [
         {
           key: 'auth',
-          value: session.auth,
+          value: 'authcookie_f9d64bb6-c223-4b67-b9c2-f1d145a16408',
+          expires: '2022-01-24T10:18:48.000Z',
+          maxAge: 604800,
           domain: 'api.vrchat.cloud',
           path: '/',
+          httpOnly: true,
           hostOnly: true,
-          pathIsDefault: true,
-          //creation: '2022-01-16T21:53:00.646Z',
-          //lastAccessed: '2022-01-16T21:53:00.646Z'
+          creation: '2022-01-17T10:18:49.217Z',
+          lastAccessed: '2022-01-17T10:18:49.217Z'
         },
         {
           key: 'apiKey',
-          value: session.apiKey,
+          value: 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26',
           domain: 'api.vrchat.cloud',
           path: '/',
           hostOnly: true,
-          pathIsDefault: true,
-          //creation: '2022-01-16T21:53:00.646Z',
-          //lastAccessed: '2022-01-16T21:53:00.646Z'
+          creation: '2022-01-17T10:18:49.217Z',
+          lastAccessed: '2022-01-17T10:18:49.217Z'
         }
       ]
     }
-
     const jar = CookieJar.deserializeSync(jar_data)
 
     AuthenticationApi.axios.defaults.jar = jar
