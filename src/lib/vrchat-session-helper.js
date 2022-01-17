@@ -63,5 +63,8 @@ export async function initializeVRChatSession () {
     //AuthenticationApi.axios.defaults.jar.setCookieSync(`apiKey=${session.apiKey}`, VRCHAT_API_URL);
   } catch (error) {
     console.error(error);
+    if (error.isAxiosError) {
+      console.error(error.response.data);
+    }
   }
 }
