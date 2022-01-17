@@ -35,19 +35,12 @@ function serialize(world) {
 
 // TODO: get world id from event
 export async function handler(event) {
+  await initializeVRChatSession();
+
   try {
     const worldId = 'wrld_829c1f70-ed07-4dac-ad58-df7152655a09';
-    const configuration = new vrchat.Configuration({
-        username: VRCHAT_USERNAME,
-        password: VRCHAT_PASSWORD,
-    });
-    
-    const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
-    await AuthenticationApi.getCurrentUser();
 
-    await initializeVRChatSession();
-
-    const WorldsApi = new vrchat.WorldsApi(configuration);
+    const WorldsApi = new vrchat.WorldsApi();
     const { data } = await WorldsApi.getWorld(worldId);
 
     console.log("RESPONSE", data)
