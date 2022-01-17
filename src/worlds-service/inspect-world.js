@@ -35,13 +35,12 @@ function serialize(world) {
 
 // TODO: get world id from event
 export async function handler(event) {
+  await initializeVRChatSession();
 
   try {
     const worldId = 'wrld_829c1f70-ed07-4dac-ad58-df7152655a09';
     
     const WorldsApi = new vrchat.WorldsApi();
-    await initializeVRChatSession(WorldsApi);
-
     const { data } = await WorldsApi.getWorld(worldId);
 
     const cookies = WorldsApi.axios.defaults.jar.serializeSync();

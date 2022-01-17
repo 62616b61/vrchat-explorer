@@ -1,16 +1,16 @@
-import axios from 'axios';
+import globalAxios from 'axios';
 import { CookieJar } from 'tough-cookie'
 
 const { VRCHAT_AUTH_API_URL } = process.env;
 
 const VRCHAT_API_URL = 'https://api.vrchat.cloud';
 
-export async function initializeVRChatSession (api) {
+export async function initializeVRChatSession () {
   if (!VRCHAT_AUTH_API_URL) {
     throw new Error('You forgot to provide VRCHAT_AUTH_API_URL!');
   }
 
-  const cookieString = await api.axios.defaults.jar.getCookieString(VRCHAT_API_URL);
+  const cookieString = await globalAxios.defaults.jar.getCookieString(VRCHAT_API_URL);
 
   // Return if session cookies are already set.
   if (cookieString.length > 0) {
@@ -51,7 +51,7 @@ export async function initializeVRChatSession (api) {
     }
     const jar = CookieJar.deserializeSync(jar_data)
 
-    api.axios.defaults.jar = jar
+    globalAxios.defaults.jar = jar
 
     //AuthenticationApi.axios.defaults.jar.setCookieSync(`auth=${session.auth}`, VRCHAT_API_URL);
     //AuthenticationApi.axios.defaults.jar.setCookieSync(`apiKey=${session.apiKey}`, VRCHAT_API_URL);
