@@ -54,7 +54,7 @@ export async function initializeVRChatSession () {
 
     globalAxios.defaults.jar = newJar;
 
-    const AuthenticationApi = new vrchat.AuthenticationApi();
+    const AuthenticationApi = new vrchat.AuthenticationApi({});
     const user = await AuthenticationApi.getCurrentUser();
 
     console.log("USER", user)
