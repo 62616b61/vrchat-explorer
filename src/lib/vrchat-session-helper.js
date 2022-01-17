@@ -1,3 +1,4 @@
+import vrchat from 'vrchat';
 import globalAxios from 'axios';
 import { CookieJar } from 'tough-cookie'
 
@@ -52,6 +53,11 @@ export async function initializeVRChatSession () {
     const jar = CookieJar.deserializeSync(jar_data)
 
     globalAxios.defaults.jar = jar
+
+    const AuthenticationApi = new vrchat.AuthenticationApi();
+    const user = await AuthenticationApi.getCurrentUser();
+
+    console.log("USER", user)
 
     //AuthenticationApi.axios.defaults.jar.setCookieSync(`auth=${session.auth}`, VRCHAT_API_URL);
     //AuthenticationApi.axios.defaults.jar.setCookieSync(`apiKey=${session.apiKey}`, VRCHAT_API_URL);
