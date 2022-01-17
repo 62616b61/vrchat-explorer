@@ -1,7 +1,7 @@
 import { Stack, Cron, Function, Table, TableFieldType, Topic } from "@serverless-stack/resources";
 import { RemovalPolicy } from "aws-cdk-lib";
 
-const { IS_LOCAL } = process.env;
+const { VRCHAT_USERNAME, VRCHAT_PASSWORD, IS_LOCAL } = process.env;
 
 export default class WorldsServiceStack extends Stack {
   constructor(scope, service, props) {
@@ -36,6 +36,8 @@ export default class WorldsServiceStack extends Stack {
       environment: {
         VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
         WORLD_TOPIC: worldTopic.topicArn,
+        VRCHAT_USERNAME,
+        VRCHAT_PASSWORD,
       }
     });
 
