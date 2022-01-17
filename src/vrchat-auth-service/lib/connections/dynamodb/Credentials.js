@@ -16,10 +16,11 @@ const CredentialsTableSchema = {
   models: {
     Session: {
       PK:       { type: String, value: 'USERNAME:${username}' },
-      SK:       { type: String, value: '${auth}:${apiKey}' },
+      SK:       { type: String, value: '${auth}:${apiKey}:${bearer}' },
       username: { type: String, required: true },
       auth:     { type: String, required: true },
       apiKey:   { type: String, required: true },
+      bearer:   { type: String, required: true },
     },
   },
 
