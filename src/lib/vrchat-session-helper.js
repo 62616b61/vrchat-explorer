@@ -25,6 +25,8 @@ export async function initializeVRChatSession () {
     const oldJar = globalAxios.defaults.jar.serializeSync();
     const newJar = CookieJar.deserializeSync(oldJar);
 
+    console.log("OLD JAR", oldJar);
+
     globalAxios.defaults.jar = newJar;
 
     const AuthenticationApi = new vrchat.AuthenticationApi();
