@@ -2,8 +2,9 @@ import vrchat from 'vrchat';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
 import { serialize } from '../lib/serializers/World/DiscoveredWorld';
 import { publish } from '../lib/connections/sns';
+import { chunk } from 'lodash';
 
-const { WORLD_TOPIC, BATCH_SIZE, IS_LOCAL } = process.env;
+const { WORLD_TOPIC, FETCH_BATCH_SIZE, PUBLISH_BATCH_SIZE, IS_LOCAL } = process.env;
 
 const PARAMETER_OFFSET_HARD_LIMIT = 999;
 const PARAMETER_NUMBER_HARD_LIMIT = 100;
@@ -86,13 +87,14 @@ async function loadVRChatWorlds({ parameters, number, offset = 0 } = {}) {
   console.log("Loaded batch: ", worlds.length, offset + number);
 
   // Publish results to SNS
-  // TODO: add PUBLISH_BATCH_SIZE which must be <= than BATCH_SIZE
-  // should be used to split big batch of data into smaller chunks
   if (!IS_LOCAL) {
     const attributes = getSNSAttributes();
     const message = worlds.map(world => serialize(world));
 
-    await publish(WORLD_TOPIC, message, attributes);
+    const parts = chunk(message, PUBLISH_BATCH_SIZE);
+    await Promise.all(
+      parts.map(part => publish(WORLD_TOPIC, part, attributes))
+    );
   }
 
   if (!worlds || !worlds.length) return;
@@ -112,7 +114,7 @@ export async function handler(event) {
   try {
     await loadVRChatWorlds({ 
       parameters: event,
-      number: parseInt(BATCH_SIZE),
+      number: parseInt(FETCH_BATCH_SIZE),
       offset: 0,
     });
   } catch (error) {

@@ -71,7 +71,8 @@ export default class WorldsServiceStack extends Stack {
       environment: {
         VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
         WORLD_TOPIC: worldTopic.topicArn,
-        BATCH_SIZE: "10",
+        FETCH_BATCH_SIZE: "100",
+        PUBLISH_BATCH_SIZE: "25",
       },
       timeout: 300,
     });
