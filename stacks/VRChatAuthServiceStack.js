@@ -45,8 +45,11 @@ export default class VRChatAuthServiceStack extends Stack {
       },
     });
 
+    // TODO: disable api logging
     const vrchatAuthApi = new Api(this, "vrchat-auth-service-api", {
+      // TODO: enable authorization on prod env (needs testing)
       //defaultAuthorizationType: ApiAuthorizationType.AWS_IAM,
+      accessLog: false,
       routes: {
         "GET /session": getSessionLambda,
       },
