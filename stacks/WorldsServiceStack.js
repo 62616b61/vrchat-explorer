@@ -128,7 +128,7 @@ export default class WorldsServiceStack extends Stack {
       });
 
       // Discover HOT worlds every day at 12:00 UTC
-      new Cron(this, "discover-worlds-HOT-24h-trigger", {
+      new Cron(this, "discover-worlds-hot-24h-trigger", {
         schedule: "cron(0 12 * * ? *)",
         job: {
           function: discoverWorldsLambda,
@@ -146,7 +146,7 @@ export default class WorldsServiceStack extends Stack {
       });
 
       // Discover RANDOM worlds every day at 13:00 UTC
-      new Cron(this, "discover-worlds-HOT-24h-trigger", {
+      new Cron(this, "discover-worlds-random-24h-trigger", {
         schedule: "cron(0 13 * * ? *)",
         job: {
           function: discoverWorldsLambda,
