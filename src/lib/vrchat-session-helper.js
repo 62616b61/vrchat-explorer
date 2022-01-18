@@ -7,7 +7,7 @@ const VRCHAT_API_URL = "https://api.vrchat.cloud";
 
 export async function initializeVRChatSession () {
   if (!VRCHAT_AUTH_API_URL) {
-    throw new Error('You forgot to provide VRCHAT_AUTH_API_URL!');
+    throw new Error('You forgot to provide VRCHAT_AUTH_API_URL env var to this lambda!');
   }
 
   const cookieString = await axios.defaults.jar.getCookieString(VRCHAT_API_URL);

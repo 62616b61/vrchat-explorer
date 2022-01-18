@@ -39,7 +39,7 @@ export default class MetricsServiceStack extends Stack {
     const saveWorldDataLambda = new Function(this, "metrics-service-save-world-data-lambda", {
       functionName: this.node.root.logicalPrefixedName("metrics-service-save-world-data"),
       handler: "src/metrics-service/save-world-data.handler",
-      permissions: [worldTopic, timestreamWriteRecordsPolicyStatement, timestreamDescribeEndpointsPolicyStatement],
+      permissions: [timestreamWriteRecordsPolicyStatement, timestreamDescribeEndpointsPolicyStatement],
       environment: {
         METRICS_DATABASE: timestreamDatabaseName,
         METRICS_TABLE: timestreamTableName,
@@ -50,7 +50,6 @@ export default class MetricsServiceStack extends Stack {
     const metricsServiceWorldQueue = new Queue(this, "metrics-service-world-queue", {
       consumer: {
         function: saveWorldDataLambda,
-        timeout: 30
       },
     });
 
