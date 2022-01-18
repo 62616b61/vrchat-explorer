@@ -18,7 +18,7 @@ export default class WorldsServiceStack extends Stack {
     // SQS
     const discoveredWorldsQueue = new Queue(this, "worlds-service-discovered-worlds-queue", {
       sqsQueue: {
-        visibilityTimeout: Duration.seconds(300 * 6),
+        visibilityTimeout: Duration.seconds(30 * 6),
       },
     });
 
@@ -55,7 +55,7 @@ export default class WorldsServiceStack extends Stack {
     // LAMBDAS
     // Discover worlds
     const discoverWorlds = new Function(this, "worlds-service-discover-worlds-lambda", {
-      functionName: this.node.root.logicalPrefixedName("worlds-service-discover"),
+      functionName: this.node.root.logicalPrefixedName("worlds-service-discover-worlds"),
       handler: "src/worlds-service/discover-worlds.handler",
       permissions: [vrchatAuthApi, worldTopic],
       environment: {
@@ -68,14 +68,14 @@ export default class WorldsServiceStack extends Stack {
 
     // Process discovered worlds
     const processWorlds = new Function(this, "worlds-service-process-lambda", {
-      functionName: this.node.root.logicalPrefixedName("worlds-service-process"),
+      functionName: this.node.root.logicalPrefixedName("worlds-service-process-worlds"),
       handler: "src/worlds-service/process-worlds.handler",
       permissions: [vrchatAuthApi, worldsTable],
       environment: {
         VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
         WORLDS_TABLE: worldsTable.tableName,
       },
-      timeout: 300,
+      timeout: 30,
     });
 
     discoveredWorldsQueue.addConsumer(this, {
@@ -88,7 +88,7 @@ export default class WorldsServiceStack extends Stack {
 
     // Inspect worlds
     const inspectWorlds = new Function(this, "worlds-service-inspect-lambda-lambda", {
-      functionName: this.node.root.logicalPrefixedName("worlds-service-inspect"),
+      functionName: this.node.root.logicalPrefixedName("worlds-service-inspect-worlds"),
       handler: "src/worlds-service/inspect-worlds.handler",
       permissions: [vrchatAuthApi, worldTopic],
       environment: {
