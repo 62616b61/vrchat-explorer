@@ -16,9 +16,19 @@ export default class WorldsServiceStack extends Stack {
     const worldTopic = new Topic(this, "worlds-service-world-topic");
 
     // SQS
+    const discoveredWorldsDLQ = new Queue(this, "worlds-service-discovered-worlds-queue-dlq", {
+      sqsQueue: {
+        retentionPeriod: Duration.seconds(1209600),
+      },
+    });
+
     const discoveredWorldsQueue = new Queue(this, "worlds-service-discovered-worlds-queue", {
       sqsQueue: {
-        visibilityTimeout: Duration.seconds(30 * 6),
+        visibilityTimeout: Duration.seconds(30 * 3),
+        deadLetterQueue: {
+          maxReceiveCount: 3,
+          queue: discoveredWorldsDLQ.sqsQueue
+        },
       },
     });
 
@@ -54,7 +64,7 @@ export default class WorldsServiceStack extends Stack {
 
     // LAMBDAS
     // Discover worlds
-    const discoverWorlds = new Function(this, "worlds-service-discover-worlds-lambda", {
+    const discoverWorldsLambda = new Function(this, "worlds-service-discover-worlds-lambda", {
       functionName: this.node.root.logicalPrefixedName("worlds-service-discover-worlds"),
       handler: "src/worlds-service/discover-worlds.handler",
       permissions: [vrchatAuthApi, worldTopic],
@@ -67,7 +77,7 @@ export default class WorldsServiceStack extends Stack {
     });
 
     // Process discovered worlds
-    const processWorlds = new Function(this, "worlds-service-process-lambda", {
+    const processWorldsLambda = new Function(this, "worlds-service-process-lambda", {
       functionName: this.node.root.logicalPrefixedName("worlds-service-process-worlds"),
       handler: "src/worlds-service/process-worlds.handler",
       permissions: [vrchatAuthApi, worldsTable],
@@ -79,7 +89,7 @@ export default class WorldsServiceStack extends Stack {
     });
 
     discoveredWorldsQueue.addConsumer(this, {
-      function: processWorlds,
+      function: processWorldsLambda,
       consumerProps: {
         enabled: true,
         batchSize: 1,
@@ -87,7 +97,7 @@ export default class WorldsServiceStack extends Stack {
     });
 
     // Inspect worlds
-    const inspectWorlds = new Function(this, "worlds-service-inspect-lambda-lambda", {
+    const inspectWorldsLambda = new Function(this, "worlds-service-inspect-lambda-lambda", {
       functionName: this.node.root.logicalPrefixedName("worlds-service-inspect-worlds"),
       handler: "src/worlds-service/inspect-worlds.handler",
       permissions: [vrchatAuthApi, worldTopic],
@@ -98,7 +108,7 @@ export default class WorldsServiceStack extends Stack {
     });
 
     // Periodically trigger inspection of worlds
-    //const triggerInspectWorlds = new Function(this, "worlds-service-trigger-inspect-lambda", {
+    //const triggerInspectWorldsLambda = new Function(this, "worlds-service-trigger-inspect-lambda", {
       //functionName: this.node.root.logicalPrefixedName("worlds-service-trigger-inspect"),
       //handler: "src/worlds-service/trigger-inspect.handler",
       //permissions: [worldsTable],
@@ -112,14 +122,14 @@ export default class WorldsServiceStack extends Stack {
       new Cron(this, "schedule_inspect_world_1m", {
         schedule: "rate(1 minute)",
         job: {
-          function: inspectWorlds,
+          function: inspectWorldsLambda,
         },
       });
 
       //new Cron(this, "trigger-discover-worlds-HOT-24h", {
         //schedule: "rate(24 hours)",
         //job: {
-          //function: discoverWorlds,
+          //function: discoverWorldsLambda,
           //jobProps: {
             //event: RuleTargetInput.fromObject({
               //featured: 'false',
