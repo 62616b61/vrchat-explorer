@@ -2,6 +2,7 @@ import { Stack, Cron, Function, Table, TableFieldType, Topic, Queue } from "@ser
 import { RuleTargetInput } from "aws-cdk-lib/aws-events";
 import { RemovalPolicy } from "aws-cdk-lib";
 import { SubscriptionFilter } from "aws-cdk-lib/aws-sns";
+import { Duration } from "aws-cdk-lib";
 
 const { IS_LOCAL } = process.env;
 
@@ -15,7 +16,11 @@ export default class WorldsServiceStack extends Stack {
     const worldTopic = new Topic(this, "worlds-service-world-topic");
 
     // SQS
-    const discoveredWorldsQueue = new Queue(this, "worlds-service-discovered-worlds-queue");
+    const discoveredWorldsQueue = new Queue(this, "worlds-service-discovered-worlds-queue", {
+      sqsQueue: {
+        visibilityTimeout: Duration.seconds(300 * 6),
+      },
+    });
 
     worldTopic.addSubscribers(this, [{
       queue: discoveredWorldsQueue,
