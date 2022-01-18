@@ -127,30 +127,41 @@ export default class WorldsServiceStack extends Stack {
         },
       });
 
-      //new Cron(this, "trigger-discover-worlds-HOT-24h", {
-        //schedule: "rate(24 hours)",
-        //job: {
-          //function: discoverWorldsLambda,
-          //jobProps: {
-            //event: RuleTargetInput.fromObject({
-              //featured: 'false',
-              //sort: 'heat',
-              //user: undefined,
-              //userId: undefined,
-              //n: 5,
-              //order: 'descending',
-              //offset: 0,
-              //search: undefined,
-              //tag: 'system_approved',
-              //notag: undefined,
-              //releaseStatus: 'public',
-              //maxUnityVersion: '2019.4.31f1',
-              //minUnityVersion: undefined,
-              //platform: undefined,
-            //}),
-          //},
-        //},
-      //});
+      // Discover HOT worlds every day at 12:00 UTC
+      new Cron(this, "discover-worlds-HOT-24h-trigger", {
+        schedule: "cron(0 12 * * ? *)",
+        job: {
+          function: discoverWorldsLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              featured: 'false',
+              sort: 'heat',
+              order: 'descending',
+              tag: 'system_approved',
+              releaseStatus: 'public',
+              maxUnityVersion: '2019.4.31f1',
+            }),
+          },
+        },
+      });
+
+      // Discover RANDOM worlds every day at 13:00 UTC
+      new Cron(this, "discover-worlds-HOT-24h-trigger", {
+        schedule: "cron(0 13 * * ? *)",
+        job: {
+          function: discoverWorldsLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              featured: 'false',
+              sort: 'shuffle',
+              order: 'descending',
+              tag: 'system_approved',
+              releaseStatus: 'public',
+              maxUnityVersion: '2019.4.31f1',
+            }),
+          },
+        },
+      });
     }
     
     this.worldTopic = worldTopic;

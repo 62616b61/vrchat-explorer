@@ -109,6 +109,8 @@ async function loadVRChatWorlds({ parameters, number, offset = 0 } = {}) {
 }
 
 export async function handler(event) {
+  console.log(event);
+
   await initializeVRChatSession();
 
   try {
