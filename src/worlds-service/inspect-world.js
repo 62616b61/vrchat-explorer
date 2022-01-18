@@ -1,25 +1,14 @@
 import vrchat from 'vrchat';
-import { publish } from '../lib/connections/sns';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
+import { serialize } from '../lib/serializers/World/WorldStats';
+import { publish } from '../lib/connections/sns';
 
 const { WORLD_TOPIC, IS_LOCAL } = process.env;
 
-function serialize(world) {
+function getSNSAttributes() {
   const currentTime = Date.now().toString();
 
-  const message = {
-    id: world.id,
-    authorId: world.authorId,
-    visits: world.visits,
-    favorites: world.favorites,
-    popularity: world.popularity,
-    heat: world.heat,
-    publicOccupants: world.publicOccupants,
-    privateOccupants: world.privateOccupants,
-    occupants: world.occupants,
-  };
-
-  const attributes = {
+  return {
     timestamp: {
       DataType: 'String',
       StringValue: currentTime,
@@ -29,8 +18,6 @@ function serialize(world) {
       StringValue: 'world-statistics',
     }
   };
-
-  return { message, attributes };
 }
 
 // TODO: get world id from event
@@ -43,10 +30,12 @@ export async function handler(event) {
     const WorldsApi = new vrchat.WorldsApi({});
     const { data } = await WorldsApi.getWorld(worldId);
 
-    console.log("RESPONSE", data)
+    console.log("RESPONSE", data);
 
     if (!IS_LOCAL) {
-      const { message, attributes } = serialize(data);
+      const attributes = getSNSAttributes();
+      const message = serialize(data);
+
       return publish(WORLD_TOPIC, message, attributes);
     }
   } catch (error) {

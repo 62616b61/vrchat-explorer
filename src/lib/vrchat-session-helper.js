@@ -21,6 +21,10 @@ export async function initializeVRChatSession () {
     console.log("RETRIEVING SESSION FROM VRCHAT-AUTH-SERVICE")
     const { data: session } = await axios.get(`${VRCHAT_AUTH_API_URL}/session`);
 
+    if (!session) {
+      throw new Error('Received empty session from vrchat-auth-service.');
+    }
+
     const authCookie = `auth=${session.auth}; Path=/; HttpOnly`
     const apiKeyCookie = `apiKey=${session.apiKey}; Path=/`
 
