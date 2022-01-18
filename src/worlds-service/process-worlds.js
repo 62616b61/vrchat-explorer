@@ -119,7 +119,9 @@ async function processSavedWorld(world, savedWorld) {
     await Author.update(
       { 
         worldId: world.id,
+        authorId: world.authorId,
         updatedAt: world.updated_at,
+        createdAt: world.created_at,
         version: world.version,
         ...(world.authorName !== savedWorld.authorName && { authorName: world.authorName }),
 
