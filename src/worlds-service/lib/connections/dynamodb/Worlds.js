@@ -76,7 +76,31 @@ const WorldsTableSchema = {
       tag:             { type: String, required: true },
 
       ...commonFields,
-    }
+    },
+
+    WorldsMetadata: {
+      PK:              { type: String, value: 'WORLDS' },
+      SK:              { type: String, value: 'METADATA' },
+      count:           { type: Number, required: true },
+    },
+
+    WorldHistoryMetadata: {
+      PK:              { type: String, value: 'WORLD:${worldId}' },
+      SK:              { type: String, value: 'METADATA' },
+      count:           { type: Number, required: true },
+    },
+
+    TagMetadata: {
+      PK:              { type: String, value: 'TAG:${tag}' },
+      SK:              { type: String, value: 'METADATA' },
+      count:           { type: Number, required: true },
+    },
+
+    AuthorMetadata: {
+      PK:              { type: String, value: 'AUTHOR:${authorId}' },
+      SK:              { type: String, value: 'METADATA' },
+      count:           { type: Number, required: true },
+    },
   },
 
   params: {
@@ -95,3 +119,8 @@ export const World = table.getModel('World');
 export const WorldHistory = table.getModel('WorldHistory');
 export const Author = table.getModel('Author');
 export const Tag = table.getModel('Tag');
+
+export const WorldsMetadata = table.getModel('WorldsMetadata');
+export const WorldHistoryMetadata = table.getModel('WorldHistoryMetadata');
+export const TagMetadata = table.getModel('TagMetadata');
+export const AuthorMetadata = table.getModel('AuthorMetadata');

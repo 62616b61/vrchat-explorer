@@ -2,6 +2,8 @@ import { Stack, Cron, Function, Table, TableFieldType, Topic, Queue } from "@ser
 import { RuleTargetInput } from "aws-cdk-lib/aws-events";
 import { RemovalPolicy } from "aws-cdk-lib";
 import { SubscriptionFilter } from "aws-cdk-lib/aws-sns";
+import { StartingPosition } from "aws-cdk-lib/aws-lambda";
+import { StreamViewType } from "aws-cdk-lib/aws-dynamodb";
 import { Duration } from "aws-cdk-lib";
 
 const { IS_LOCAL } = process.env;
@@ -55,6 +57,8 @@ export default class WorldsServiceStack extends Stack {
       globalIndexes: {
         GSI1: { partitionKey: "GSI1PK", sortKey: "GSI1SK" },
       },
+      // Enable DynamoDB stream
+      stream: StreamViewType.KEYS_ONLY,
       ...(
         IS_LOCAL
           ? { dynamodbTable: { removalPolicy: RemovalPolicy.DESTROY } }
@@ -94,6 +98,30 @@ export default class WorldsServiceStack extends Stack {
       consumerProps: {
         enabled: true,
         batchSize: 1,
+      },
+    });
+
+    // Process Worlds table DynamoDB stream
+    // Count total worlds and total worlds count by author
+    const processWorldsTableStream = new Function(this, "worlds-service-process-worlds-table-stream-lambda", {
+      functionName: this.node.root.logicalPrefixedName("worlds-service-process-worlds-table-stream"),
+      handler: "src/worlds-service/process-worlds-table-stream.handler",
+      permissions: [worldsTable],
+      environment: {
+        WORLDS_TABLE: worldsTable.tableName,
+      },
+      timeout: 30,
+    });
+
+    worldsTable.addConsumers(this, {
+      consumer1: {
+        function: processWorldsTableStream,
+        consumerProps: {
+          batchSize: 100,
+          retryAttempts: 5,
+          maxBatchingWindow: Duration.seconds(30),
+          startingPosition: StartingPosition.LATEST,
+        },
       },
     });
 
