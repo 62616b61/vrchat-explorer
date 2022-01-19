@@ -97,17 +97,6 @@ export default class WorldsServiceStack extends Stack {
       },
     });
 
-    // Inspect worlds
-    const inspectWorldsLambda = new Function(this, "worlds-service-inspect-lambda-lambda", {
-      functionName: this.node.root.logicalPrefixedName("worlds-service-inspect-worlds"),
-      handler: "src/worlds-service/inspect-worlds.handler",
-      permissions: [vrchatAuthApi, worldTopic],
-      environment: {
-        VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
-        WORLD_TOPIC: worldTopic.topicArn,
-      },
-    });
-
     // Periodically trigger inspection of worlds
     //const triggerInspectWorldsLambda = new Function(this, "worlds-service-trigger-inspect-lambda", {
       //functionName: this.node.root.logicalPrefixedName("worlds-service-trigger-inspect"),
@@ -120,13 +109,6 @@ export default class WorldsServiceStack extends Stack {
     
     // LAMBDA SCHEDULED TRIGGERS
     if (!IS_LOCAL) {
-      new Cron(this, "schedule_inspect_world_1m", {
-        schedule: "rate(1 minute)",
-        job: {
-          function: inspectWorldsLambda,
-        },
-      });
-
       // Discover HOT worlds every day at 12:00 UTC
       new Cron(this, "discover-worlds-hot-24h-trigger", {
         schedule: "cron(0 12 * * ? *)",
