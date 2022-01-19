@@ -3,7 +3,7 @@ import { xor, difference, isEqual } from 'lodash';
 
 export async function processSavedWorld(world, savedWorld) {
   if (!isEqual(world.version, savedWorld.version)) {
-    //console.log(`World ${world.id} - version changed from ${savedWorld.version} to ${world.version}`)
+    console.log(`World ${world.id} - version changed from ${savedWorld.version} to ${world.version}`)
     const commonFields = {
       worldId: world.id,
       authorId: world.authorId,
@@ -82,7 +82,14 @@ export async function processSavedWorld(world, savedWorld) {
     const removedTags = difference(savedWorld.tags, world.tags);
     await Promise.all(removedTags.map((tag) => Tag.remove({ tag, ...commonFields }, { transaction })));
 
-    return table.transact("write", transaction);
+    try {
+      await table.transact("write", transaction);
+    } catch (error) {
+      console.log("error message", error.message);
+      console.log("error code", error.code);
+      console.log("error context", error.context);
+      console.log("cancellation reasons", error.context.err.CancellationReasons);
+    }
   } else {
     //console.log(`World ${world.id} - version unchanged`);
     // TODO: compare tags and other stuff that can change without version changing

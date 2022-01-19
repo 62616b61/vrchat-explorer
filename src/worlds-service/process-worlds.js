@@ -13,8 +13,6 @@ async function processMessage(message) {
 
   const WorldsApi = new vrchat.WorldsApi({});
   try {
-    // error.response = status: 429, statusText: 'Too Many Requests',
-    // error.response.data = { error: 'slow down', status_code: 429 }
     const { data: discoveredWorld } = await WorldsApi.getWorld(message.id);
 
     if (savedWorld && savedWorld.status === "enabled") {
@@ -26,12 +24,24 @@ async function processMessage(message) {
     if (error.isAxiosError) {
       if (error.response.status === 404) {
         // TODO: send removal request
-        console.log("World not found!")
+        console.log("World not found!");
         return;
       }
 
-      console.log(error.response)
-      console.log(error.response.data)
+      // error.response = status: 429, statusText: 'Too Many Requests',
+      // error.response.data = { error: 'slow down', status_code: 429 }
+      if (error.response.status === 429) {
+        // TODO: send removal request
+        console.log("Too many requests");
+        return;
+      }
+
+      if (error.isAxiosError) {
+        console.log("RESEPONSE: ", error.response);
+        console.log("RESPONSE DATA: ", error.response.data);
+      } else {
+        console.log("ERROR GENERIC: ", error);
+      }
       throw error;
     }
   }
