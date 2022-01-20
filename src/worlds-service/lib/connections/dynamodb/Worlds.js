@@ -1,5 +1,5 @@
 import Dynamo from 'dynamodb-onetable/Dynamo';
-import { Model, Table } from 'dynamodb-onetable';
+import { Table } from 'dynamodb-onetable';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
 const { WORLDS_TABLE } = process.env;
@@ -9,6 +9,8 @@ const commonFields = {
   worldId:             { type: String, required: true },
   authorId:            { type: String, required: true },
   authorName:          { type: String, required: true },
+  imageUrl:            { type: String, required: true },
+  thumbnailImageUrl:   { type: String, required: true },
 
   favorites:           { type: Number, required: true },
   tags:                { type: Array,  required: true },

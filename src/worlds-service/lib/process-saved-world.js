@@ -11,6 +11,8 @@ export async function processSavedWorld(world, savedWorld) {
       worldId: world.id,
       authorId: world.authorId,
       authorName: world.authorName,
+      imageUrl: world.imageUrl,
+      thumbnailImageUrl: world.thumbnailImageUrl,
 
       favorites: world.favorites,
       tags: world.tags,
@@ -31,6 +33,8 @@ export async function processSavedWorld(world, savedWorld) {
         updatedAt: world.updated_at,
         version: world.version,
         ...(world.authorName !== savedWorld.authorName && { authorName: world.authorName }),
+        ...(world.imageUrl !== savedWorld.imageUrl && { imageUrl: world.imageUrl }),
+        ...(world.thumbnailImageUrl !== savedWorld.thumbnailImageUrl && { thumbnailImageUrl: world.thumbnailImageUrl }),
 
         ...(world.name !== savedWorld.name && { name: world.name }),
         ...(world.favorites !== savedWorld.favorites && { favorites: world.favorites }),
@@ -68,6 +72,8 @@ export async function processSavedWorld(world, savedWorld) {
         createdAt: world.created_at,
         version: world.version,
         ...(world.authorName !== savedWorld.authorName && { authorName: world.authorName }),
+        ...(world.imageUrl !== savedWorld.imageUrl && { imageUrl: world.imageUrl }),
+        ...(world.thumbnailImageUrl !== savedWorld.thumbnailImageUrl && { thumbnailImageUrl: world.thumbnailImageUrl }),
 
         ...(world.name !== savedWorld.name && { name: world.name }),
         ...(world.favorites !== savedWorld.favorites && { favorites: world.favorites }),

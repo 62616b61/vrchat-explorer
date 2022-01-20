@@ -7,6 +7,8 @@ export async function processUnsavedWorld(world) {
     worldId: world.id,
     authorId: world.authorId,
     authorName: world.authorName,
+    imageUrl: world.imageUrl,
+    thumbnailImageUrl: world.thumbnailImageUrl,
 
     favorites: world.favorites,
     tags: world.tags,
