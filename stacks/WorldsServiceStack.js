@@ -48,24 +48,24 @@ export default class WorldsServiceStack extends Stack {
     }]);
 
     // WORLD VERSIONS QUEUE
-    const worldVersionsDLQ = new Queue(this, "worlds-service-world-versions-queue-dlq", {
+    const saveWorldPreviewDLQ = new Queue(this, "worlds-service-save-world-preview-dlq", {
       sqsQueue: {
         retentionPeriod: Duration.seconds(1209600),
       },
     });
 
-    const worldVersionsQueue = new Queue(this, "worlds-service-world-versions-queue", {
+    const saveWorldPreviewQueue = new Queue(this, "worlds-service-save-world-preview-queue", {
       sqsQueue: {
         visibilityTimeout: Duration.seconds(30 * 3),
         deadLetterQueue: {
           maxReceiveCount: 3,
-          queue: worldVersionsDLQ.sqsQueue
+          queue: saveWorldPreviewDLQ.sqsQueue
         },
       },
     });
 
     worldTopic.addSubscribers(this, [{
-      queue: worldVersionsQueue,
+      queue: saveWorldPreviewQueue,
       subscriberProps: {
         filterPolicy: {
           type: SubscriptionFilter.stringFilter({
@@ -175,7 +175,7 @@ export default class WorldsServiceStack extends Stack {
       },
     });
 
-    worldVersionsQueue.addConsumer(this, {
+    saveWorldPreviewQueue.addConsumer(this, {
       function: saveWorldPreviewImageLambda,
       consumerProps: {
         enabled: true,
