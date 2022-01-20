@@ -35,6 +35,7 @@ async function processMessage({ message, imageProperty }) {
 
     await upload.done();
   } catch (error) {
+    console.log("MESSAGE", message);
     console.log("ERROR", error);
     throw error;
   }
