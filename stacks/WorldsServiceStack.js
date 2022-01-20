@@ -4,6 +4,7 @@ import { RemovalPolicy } from "aws-cdk-lib";
 import { SubscriptionFilter } from "aws-cdk-lib/aws-sns";
 import { StartingPosition } from "aws-cdk-lib/aws-lambda";
 import { StreamViewType } from "aws-cdk-lib/aws-dynamodb";
+import { BucketAccessControl } from "aws-cdk-lib/aws-s3";
 import { Duration } from "aws-cdk-lib";
 
 const { IS_LOCAL } = process.env;
@@ -75,7 +76,11 @@ export default class WorldsServiceStack extends Stack {
     }]);
 
     // S3
-    const worldImagesBucket = new Bucket(this, "worlds-service-world-images");
+    const worldImagesBucket = new Bucket(this, "worlds-service-world-images", {
+      s3Bucket: {
+        accessControl: BucketAccessControl.PUBLIC_READ,
+      },
+    });
 
     // DYNAMO
     const worldsTable = new Table(this, "worlds-service-worlds", {
