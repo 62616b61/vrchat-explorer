@@ -47,7 +47,7 @@ export default class WorldsServiceStack extends Stack {
       }
     }]);
 
-    // WORLD VERSIONS QUEUE
+    // WORLD PREVIEWS QUEUE
     const saveWorldPreviewDLQ = new Queue(this, "worlds-service-save-world-preview-dlq", {
       sqsQueue: {
         retentionPeriod: Duration.seconds(1209600),
