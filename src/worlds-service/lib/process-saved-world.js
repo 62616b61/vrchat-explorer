@@ -1,8 +1,11 @@
-import { table, Author, Tag, World, WorldHistory } from './connections/dynamodb/Worlds';
 import { xor, difference, isEqual } from 'lodash';
+import { table, Author, Tag, World, WorldHistory } from './connections/dynamodb/Worlds';
+import { publishWorldVersion } from './publish-world-version';
 
 export async function processSavedWorld(world, savedWorld) {
-  if (!isEqual(world.version, savedWorld.version)) {
+  const versionHasChanged = !isEqual(world.version, savedWorld.version);
+
+  if (versionHasChanged) {
     console.log(`World ${world.id} - version changed from ${savedWorld.version} to ${world.version}`)
     const commonFields = {
       worldId: world.id,
@@ -90,6 +93,8 @@ export async function processSavedWorld(world, savedWorld) {
       console.log("error context", error.context);
       console.log("cancellation reasons", error.context.err.CancellationReasons);
     }
+
+    return publishWorldVersion(world);
   } else {
     //console.log(`World ${world.id} - version unchanged`);
     // TODO: compare tags and other stuff that can change without version changing

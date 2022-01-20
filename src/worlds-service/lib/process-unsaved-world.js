@@ -1,4 +1,5 @@
 import { table, Author, Tag, World, WorldHistory } from './connections/dynamodb/Worlds';
+import { publishWorldVersion } from './publish-world-version';
 
 export async function processUnsavedWorld(world) {
   console.log(`World ${world.id} - saving new world`);
@@ -62,4 +63,6 @@ export async function processUnsavedWorld(world) {
     console.log("error context", error.context);
     console.log("cancellation reasons", error.context.err.CancellationReasons);
   }
+
+  return publishWorldVersion(world);
 }

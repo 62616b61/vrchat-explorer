@@ -1,4 +1,4 @@
-import { Stack, Cron, Function, Table, TableFieldType, Topic, Queue } from "@serverless-stack/resources";
+import { Bucket, Stack, Cron, Function, Table, TableFieldType, Topic, Queue } from "@serverless-stack/resources";
 import { RuleTargetInput } from "aws-cdk-lib/aws-events";
 import { RemovalPolicy } from "aws-cdk-lib";
 import { SubscriptionFilter } from "aws-cdk-lib/aws-sns";
@@ -18,6 +18,7 @@ export default class WorldsServiceStack extends Stack {
     const worldTopic = new Topic(this, "worlds-service-world-topic");
 
     // SQS
+    // DISCOVERED WORLDS QUEUE
     const discoveredWorldsDLQ = new Queue(this, "worlds-service-discovered-worlds-queue-dlq", {
       sqsQueue: {
         retentionPeriod: Duration.seconds(1209600),
@@ -45,6 +46,37 @@ export default class WorldsServiceStack extends Stack {
       }
     }]);
 
+    // WORLD VERSIONS QUEUE
+    const worldVersionsDLQ = new Queue(this, "worlds-service-world-versions-queue-dlq", {
+      sqsQueue: {
+        retentionPeriod: Duration.seconds(1209600),
+      },
+    });
+
+    const worldVersionsQueue = new Queue(this, "worlds-service-world-versions-queue", {
+      sqsQueue: {
+        visibilityTimeout: Duration.seconds(30 * 3),
+        deadLetterQueue: {
+          maxReceiveCount: 3,
+          queue: worldVersionsDLQ.sqsQueue
+        },
+      },
+    });
+
+    worldTopic.addSubscribers(this, [{
+      queue: worldVersionsQueue,
+      subscriberProps: {
+        filterPolicy: {
+          type: SubscriptionFilter.stringFilter({
+            whitelist: ["world-version"],
+          }),
+        },
+      }
+    }]);
+
+    // S3
+    const worldImagesBucket = new Bucket(this, "worlds-service-world-images");
+
     // DYNAMO
     const worldsTable = new Table(this, "worlds-service-worlds", {
       fields: {
@@ -58,11 +90,11 @@ export default class WorldsServiceStack extends Stack {
         GSI1: { partitionKey: "GSI1PK", sortKey: "GSI1SK" },
       },
       // Enable DynamoDB stream
-      stream: StreamViewType.KEYS_ONLY,
+      //stream: StreamViewType.KEYS_ONLY,
       ...(
         IS_LOCAL
           ? { dynamodbTable: { removalPolicy: RemovalPolicy.DESTROY } }
-          : {}
+          : { stream: StreamViewType.KEYS_ONLY }
       ),
     });
 
@@ -85,10 +117,11 @@ export default class WorldsServiceStack extends Stack {
     const processWorldsLambda = new Function(this, "worlds-service-process-lambda", {
       functionName: this.node.root.logicalPrefixedName("worlds-service-process-worlds"),
       handler: "src/worlds-service/process-worlds.handler",
-      permissions: [vrchatAuthApi, worldsTable],
+      permissions: [vrchatAuthApi, worldsTable, worldTopic],
       environment: {
         VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
         WORLDS_TABLE: worldsTable.tableName,
+        WORLD_TOPIC: worldTopic.topicArn,
       },
       timeout: 30,
     });
@@ -101,27 +134,47 @@ export default class WorldsServiceStack extends Stack {
       },
     });
 
-    // Process Worlds table DynamoDB stream
-    // Count total worlds and total worlds count by author
-    const processWorldsTableStream = new Function(this, "worlds-service-process-worlds-table-stream-lambda", {
-      functionName: this.node.root.logicalPrefixedName("worlds-service-process-worlds-table-stream"),
-      handler: "src/worlds-service/process-worlds-table-stream.handler",
-      permissions: [worldsTable],
+    if (!IS_LOCAL) {
+      // Process Worlds table DynamoDB stream
+      // Count total worlds and total worlds count by author
+      const processWorldsTableStreamLambda = new Function(this, "worlds-service-process-worlds-table-stream-lambda", {
+        functionName: this.node.root.logicalPrefixedName("worlds-service-process-worlds-table-stream"),
+        handler: "src/worlds-service/process-worlds-table-stream.handler",
+        permissions: [worldsTable],
+        environment: {
+          WORLDS_TABLE: worldsTable.tableName,
+        },
+        timeout: 30,
+      });
+
+      worldsTable.addConsumers(this, {
+        consumer1: {
+          function: processWorldsTableStreamLambda,
+          consumerProps: {
+            batchSize: 100,
+            retryAttempts: 5,
+            maxBatchingWindow: Duration.seconds(30),
+            startingPosition: StartingPosition.LATEST,
+          },
+        },
+      });
+    }
+
+    // Save world images and thumbnails
+    const saveWorldPreviewImageLambda = new Function(this, "worlds-service-save-world-preview-image-lambda", {
+      functionName: this.node.root.logicalPrefixedName("worlds-service-save-world-preview-image"),
+      handler: "src/worlds-service/save-world-preview-image.handler",
+      permissions: [worldImagesBucket],
       environment: {
-        WORLDS_TABLE: worldsTable.tableName,
+        WORLD_IMAGES_BUCKET: worldImagesBucket.bucketName,
       },
-      timeout: 30,
     });
 
-    worldsTable.addConsumers(this, {
-      consumer1: {
-        function: processWorldsTableStream,
-        consumerProps: {
-          batchSize: 100,
-          retryAttempts: 5,
-          maxBatchingWindow: Duration.seconds(30),
-          startingPosition: StartingPosition.LATEST,
-        },
+    worldVersionsQueue.addConsumer(this, {
+      function: saveWorldPreviewImageLambda,
+      consumerProps: {
+        enabled: true,
+        batchSize: 1,
       },
     });
 

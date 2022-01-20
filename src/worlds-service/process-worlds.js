@@ -1,6 +1,7 @@
 import vrchat from 'vrchat';
-import { World } from './lib/connections/dynamodb/Worlds';
+import { parse } from '../lib/connections/sqs';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
+import { World } from './lib/connections/dynamodb/Worlds';
 import { processSavedWorld } from './lib/process-saved-world';
 import { processUnsavedWorld } from './lib/process-unsaved-world';
 
@@ -48,9 +49,7 @@ async function processMessage(message) {
 }
 
 export async function handler(event) {
-  // TODO: catch for malformed message
-  const body = JSON.parse(event.Records[0].body);
-  const messages = JSON.parse(body.Message);
+  const messages = parse(event);
 
   if (messages.length > 0) {
     await initializeVRChatSession();
