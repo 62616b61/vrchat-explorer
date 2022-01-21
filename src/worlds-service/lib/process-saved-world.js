@@ -7,6 +7,7 @@ export async function processSavedWorld(world, savedWorld) {
 
   if (versionHasChanged) {
     console.log(`World ${world.id} - version changed from ${savedWorld.version} to ${world.version}`)
+
     const commonFields = {
       worldId: world.id,
       authorId: world.authorId,
@@ -15,6 +16,7 @@ export async function processSavedWorld(world, savedWorld) {
       thumbnailImageUrl: world.thumbnailImageUrl,
 
       favorites: world.favorites,
+      heat: world.heat,
       tags: world.tags,
       name: world.name,
 
@@ -56,7 +58,6 @@ export async function processSavedWorld(world, savedWorld) {
       {
         description: world.description,
         releaseStatus: world.releaseStatus,
-        heat: world.heat,
         popularity: world.popularity,
         capacity: world.capacity,
         ...commonFields,
@@ -77,6 +78,7 @@ export async function processSavedWorld(world, savedWorld) {
 
         ...(world.name !== savedWorld.name && { name: world.name }),
         ...(world.favorites !== savedWorld.favorites && { favorites: world.favorites }),
+        ...(world.heat !== savedWorld.heat && { heat: world.heat }),
         ...(xor(world.tags, savedWorld.tags).length > 0 && { tags: world.tags }),
 
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,

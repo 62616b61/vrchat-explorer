@@ -11,6 +11,7 @@ export async function processUnsavedWorld(world) {
     thumbnailImageUrl: world.thumbnailImageUrl,
 
     favorites: world.favorites,
+    heat: world.heat,
     tags: world.tags,
     name: world.name,
 
@@ -30,7 +31,6 @@ export async function processUnsavedWorld(world) {
       schedule: '24h',
       description: world.description,
       releaseStatus: world.releaseStatus,
-      heat: world.heat,
       popularity: world.popularity,
       capacity: world.capacity,
       ...commonFields,
@@ -42,7 +42,6 @@ export async function processUnsavedWorld(world) {
     {
       description: world.description,
       releaseStatus: world.releaseStatus,
-      heat: world.heat,
       popularity: world.popularity,
       capacity: world.capacity,
       ...commonFields,

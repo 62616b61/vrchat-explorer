@@ -94,6 +94,9 @@ export default class WorldsServiceStack extends Stack {
       globalIndexes: {
         GSI1: { partitionKey: "GSI1PK", sortKey: "GSI1SK" },
       },
+      localIndexes: {
+        LSI1: { sortKey: "SK2" },
+      },
       // Enable DynamoDB stream
       //stream: StreamViewType.KEYS_ONLY,
       ...(
