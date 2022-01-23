@@ -114,8 +114,6 @@ export default class WorldsServiceStack extends Stack {
       environment: {
         VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
         WORLD_TOPIC: worldTopic.topicArn,
-        FETCH_BATCH_SIZE: "100",
-        PUBLISH_BATCH_SIZE: "25",
       },
       timeout: 300,
     });
@@ -198,40 +196,54 @@ export default class WorldsServiceStack extends Stack {
     // LAMBDA SCHEDULED TRIGGERS
     if (!IS_LOCAL) {
       // Discover HOT worlds every day at 12:00 UTC
-      new Cron(this, "discover-worlds-hot-24h-trigger", {
-        schedule: "cron(0 12 * * ? *)",
-        job: {
-          function: discoverWorldsLambda,
-          jobProps: {
-            event: RuleTargetInput.fromObject({
-              featured: 'false',
-              sort: 'heat',
-              order: 'descending',
-              tag: 'system_approved',
-              releaseStatus: 'public',
-              maxUnityVersion: '2019.4.31f1',
-            }),
-          },
-        },
-      });
+      //new Cron(this, "discover-worlds-hot-24h-trigger", {
+        //schedule: "cron(0 12 * * ? *)",
+        //job: {
+          //function: discoverWorldsLambda,
+          //jobProps: {
+            //event: RuleTargetInput.fromObject({
+              //batching: {
+                //FETCH_LIMIT: 500,
+                //FETCH_BATCH_SIZE: 100,
+                //PUBLISH_BATCH_SIZE: 25,
+              //},
+              //filters: {
+                //featured: 'false',
+                //sort: 'heat',
+                //order: 'descending',
+                //tag: 'system_approved',
+                //releaseStatus: 'public',
+                //maxUnityVersion: '2019.4.31f1',
+              //},
+            //}),
+          //},
+        //},
+      //});
 
-      // Discover RANDOM worlds every day at 13:00 UTC
-      new Cron(this, "discover-worlds-random-24h-trigger", {
-        schedule: "cron(0 13 * * ? *)",
-        job: {
-          function: discoverWorldsLambda,
-          jobProps: {
-            event: RuleTargetInput.fromObject({
-              featured: 'false',
-              sort: 'shuffle',
-              order: 'descending',
-              tag: 'system_approved',
-              releaseStatus: 'public',
-              maxUnityVersion: '2019.4.31f1',
-            }),
-          },
-        },
-      });
+      //// Discover RANDOM worlds every day at 13:00 UTC
+      //new Cron(this, "discover-worlds-random-24h-trigger", {
+        //schedule: "cron(0 13 * * ? *)",
+        //job: {
+          //function: discoverWorldsLambda,
+          //jobProps: {
+            //event: RuleTargetInput.fromObject({
+              //batching: {
+                //FETCH_LIMIT: 1000,
+                //FETCH_BATCH_SIZE: 100,
+                //PUBLISH_BATCH_SIZE: 25,
+              //},
+              //filters: {
+                //featured: 'false',
+                //sort: 'shuffle',
+                //order: 'descending',
+                //tag: 'system_approved',
+                //releaseStatus: 'public',
+                //maxUnityVersion: '2019.4.31f1',
+              //},
+            //}),
+          //},
+        //},
+      //});
     }
     
     this.worldTopic = worldTopic;
