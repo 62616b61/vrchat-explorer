@@ -19,7 +19,7 @@ async function processMessage({ message, imageProperty }) {
 
   const contentType = response.headers['content-type'];
   const imageUrlHash = crypto.createHash('sha256').update(imageUrl).digest('hex');
-  const key = `${authorId}/${id}/${version}/${imageUrlHash}.png`;
+  const key = `${authorId}/${id}/${imageProperty}-${version}-${imageUrlHash}.png`;
 
   try {
     const upload = new Upload({

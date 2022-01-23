@@ -68,9 +68,8 @@ export default class WorldsServiceStack extends Stack {
       queue: saveWorldPreviewQueue,
       subscriberProps: {
         filterPolicy: {
-          type: SubscriptionFilter.stringFilter({
-            whitelist: ["world-version"],
-          }),
+          type: SubscriptionFilter.stringFilter({ whitelist: ["world-version"] }),
+          previewHasChanged: SubscriptionFilter.stringFilter({ whitelist: ["true"] }),
         },
       }
     }]);

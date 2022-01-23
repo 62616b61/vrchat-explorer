@@ -65,5 +65,5 @@ export async function processUnsavedWorld(world) {
     console.log("cancellation reasons", error.context.err.CancellationReasons);
   }
 
-  return publishWorldVersion(world);
+  return publishWorldVersion(world, true);
 }

@@ -4,6 +4,7 @@ import { publishWorldVersion } from './publish-world-version';
 
 export async function processSavedWorld(world, savedWorld) {
   const versionHasChanged = !isEqual(world.version, savedWorld.version);
+  const previewHasChanged = !isEqual(world.imageUrl, savedWorld.imageUrl);
 
   if (versionHasChanged) {
     console.log(`World ${world.id} - version changed from ${savedWorld.version} to ${world.version}`)
@@ -102,7 +103,7 @@ export async function processSavedWorld(world, savedWorld) {
       console.log("cancellation reasons", error.context.err.CancellationReasons);
     }
 
-    return publishWorldVersion(world);
+    return publishWorldVersion(world, previewHasChanged);
   } else {
     //console.log(`World ${world.id} - version unchanged`);
     // TODO: compare tags and other stuff that can change without version changing
