@@ -195,6 +195,56 @@ export default class WorldsServiceStack extends Stack {
     
     // LAMBDA SCHEDULED TRIGGERS
     if (!IS_LOCAL) {
+      // Discover NEW worlds every hour
+      new Cron(this, "discover-worlds-NEW-1h-trigger", {
+        schedule: "rate(1 hour)",
+        job: {
+          function: discoverWorldsLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              batching: {
+                FETCH_LIMIT: 100,
+                FETCH_BATCH_SIZE: 100,
+                PUBLISH_BATCH_SIZE: 25,
+              },
+              filters: {
+                featured: 'false',
+                sort: 'publicationDate',
+                order: 'descending',
+                tag: 'system_approved',
+                releaseStatus: 'public',
+                maxUnityVersion: '2019.4.31f1',
+              },
+            }),
+          },
+        },
+      });
+
+      // Discover RECENTLY UPDATED worlds every hour
+      new Cron(this, "discover-worlds-RECENTLY-UPDATED-1h-trigger", {
+        schedule: "rate(1 hour)",
+        job: {
+          function: discoverWorldsLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              batching: {
+                FETCH_LIMIT: 100,
+                FETCH_BATCH_SIZE: 100,
+                PUBLISH_BATCH_SIZE: 25,
+              },
+              filters: {
+                featured: 'false',
+                sort: 'updated',
+                order: 'descending',
+                tag: 'system_approved',
+                releaseStatus: 'public',
+                maxUnityVersion: '2019.4.31f1',
+              },
+            }),
+          },
+        },
+      });
+
       // Discover HOT worlds every day at 12:00 UTC
       //new Cron(this, "discover-worlds-hot-24h-trigger", {
         //schedule: "cron(0 12 * * ? *)",
