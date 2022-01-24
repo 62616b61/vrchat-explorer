@@ -71,7 +71,7 @@ export default class WorldsServiceStack extends Stack {
           type: SubscriptionFilter.stringFilter({ whitelist: ["world-version"] }),
           previewHasChanged: SubscriptionFilter.stringFilter({ whitelist: ["true"] }),
         },
-      }
+      },
     }]);
 
     // S3

@@ -66,8 +66,7 @@ export async function processSavedWorld(world, savedWorld) {
       { transaction },
     );
 
-    await Author.update(
-      { 
+    const authorInput = { 
         worldId: world.id,
         authorId: world.authorId,
         updatedAt: world.updated_at,
@@ -84,7 +83,9 @@ export async function processSavedWorld(world, savedWorld) {
 
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
-      },
+      }
+    await Author.update(
+      authorInput,
       { transaction },
     );
 
@@ -101,6 +102,9 @@ export async function processSavedWorld(world, savedWorld) {
       console.log("error code", error.code);
       console.log("error context", error.context);
       console.log("cancellation reasons", error.context.err.CancellationReasons);
+      console.log("world", world);
+      console.log("auhtor input", authorInput);
+      throw error;
     }
 
     return publishWorldVersion(world, previewHasChanged);
