@@ -19,6 +19,10 @@ export default class MetricsServiceStack extends Stack {
     const worldMetricsTable = new CfnTable(this, 'metrics-service-timestream-table-metrics', {
       tableName: timestreamTableName,
       databaseName: timestreamDatabaseName,
+      retentionProperties: {
+        MemoryStoreRetentionPeriodInHours: "2",
+        MagneticStoreRetentionPeriodInDays: "2",
+      },
     });
 
     worldMetricsTable.node.addDependency(metricsDatabase);
