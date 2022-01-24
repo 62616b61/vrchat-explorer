@@ -22,7 +22,6 @@ const commonFields = {
   updatedAt:           { type: String, required: true },
   publicationDate:     { type: String },
   labsPublicationDate: { type: String },
-  unityPackages:       { type: Array },
 }
 
 const WorldsTableSchema = {
@@ -47,6 +46,7 @@ const WorldsTableSchema = {
       releaseStatus:   { type: String, enum: ['public', 'private', 'hidden'] },
       popularity:      { type: Number, required: true },
       capacity:        { type: Number, required: true },
+      unityPackages:   { type: Array },
 
       ...commonFields,
     },
@@ -60,6 +60,7 @@ const WorldsTableSchema = {
       releaseStatus:   { type: String, enum: ['public', 'private', 'hidden'] },
       popularity:      { type: Number, required: true },
       capacity:        { type: Number, required: true },
+      unityPackages:   { type: Array },
 
       ...commonFields,
     },

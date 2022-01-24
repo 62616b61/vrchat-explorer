@@ -20,7 +20,6 @@ export async function processUnsavedWorld(world) {
     updatedAt: world.updated_at,
     publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
     labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
-    unityPackages: world.unityPackages,
   };
 
   let transaction = {};
@@ -34,6 +33,7 @@ export async function processUnsavedWorld(world) {
       releaseStatus: world.releaseStatus,
       popularity: world.popularity,
       capacity: world.capacity,
+      unityPackages: world.unityPackages,
       ...commonFields,
     },
     { transaction },
@@ -45,6 +45,7 @@ export async function processUnsavedWorld(world) {
       releaseStatus: world.releaseStatus,
       popularity: world.popularity,
       capacity: world.capacity,
+      unityPackages: world.unityPackages,
       ...commonFields,
     },
     { transaction },
