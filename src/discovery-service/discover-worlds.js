@@ -96,7 +96,7 @@ async function loadVRChatWorlds({ parameters, number = DEFAULT_ARGUMENTS.batchin
   console.log("Loaded batch (size, total): ", worlds.length, worlds.length + fetched);
 
   // Publish results to SNS
-  //if (!IS_LOCAL) {
+  if (!IS_LOCAL) {
     const attributes = getSNSAttributes();
     const message = worlds.map(world => serialize(world));
 
@@ -104,7 +104,7 @@ async function loadVRChatWorlds({ parameters, number = DEFAULT_ARGUMENTS.batchin
     await Promise.all(
       parts.map(part => publish(WORLD_TOPIC, part, attributes))
     );
-  //}
+  }
 
   if (!worlds || !worlds.length) return;
   if (worlds.length && worlds.length === 0) return;
