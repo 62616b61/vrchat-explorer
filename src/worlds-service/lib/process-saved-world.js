@@ -1,4 +1,4 @@
-import { xor, difference, isEqual } from 'lodash';
+import { xor, difference, isEqual, intersectionWith } from 'lodash';
 import { table, Author, Tag, World, WorldHistory } from './connections/dynamodb/Worlds';
 import { publishWorldVersion } from './publish-world-version';
 
@@ -66,7 +66,8 @@ export async function processSavedWorld(world, savedWorld) {
       { transaction },
     );
 
-    const authorInput = { 
+    await Author.update(
+      {
         worldId: world.id,
         authorId: world.authorId,
         updatedAt: world.updated_at,
@@ -83,9 +84,7 @@ export async function processSavedWorld(world, savedWorld) {
 
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
-      }
-    await Author.update(
-      authorInput,
+      },
       { transaction },
     );
 
@@ -95,6 +94,9 @@ export async function processSavedWorld(world, savedWorld) {
     const removedTags = difference(savedWorld.tags, world.tags);
     await Promise.all(removedTags.map((tag) => Tag.remove({ tag, ...commonFields }, { transaction })));
 
+    const unchangedTags = intersectionWith(world.tags, savedWorld.tags, isEqual);
+    await Promise.all(unchangedTags.map((tag) => Tag.update({ tag, ...commonFields }, { transaction, exists: null })));
+
     try {
       await table.transact("write", transaction);
     } catch (error) {
@@ -103,7 +105,6 @@ export async function processSavedWorld(world, savedWorld) {
       console.log("error context", error.context);
       console.log("cancellation reasons", error.context.err.CancellationReasons);
       console.log("world", world);
-      console.log("auhtor input", authorInput);
       throw error;
     }
 

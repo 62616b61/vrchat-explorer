@@ -65,7 +65,7 @@ const WorldsTableSchema = {
 
     Author: {
       PK:              { type: String, value: 'AUTHOR:${authorId}' },
-      SK:              { type: String, value: 'UPDATED_AT:${updatedAt}:${worldId}' },
+      SK:              { type: String, value: 'CREATED_AT:${createdAt}:${worldId}' },
       SK2:             { type: String, value: 'HEAT:${heat}' },
 
       ...commonFields,
@@ -73,8 +73,10 @@ const WorldsTableSchema = {
 
     Tag: {
       PK:              { type: String, value: 'TAG:${tag}' },
-      SK:              { type: String, value: 'UPDATED_AT:${updatedAt}:${worldId}' },
+      SK:              { type: String, value: 'CREATED_AT:${createdAt}:${worldId}' },
       SK2:             { type: String, value: 'HEAT:${heat}' },
+      GSI1PK:          { type: String, value: 'TAG:${tag}' },
+      GSI1SK:          { type: String, value: 'UPDATED_AT:${updatedAt}:${worldId}' },
 
       tag:             { type: String, required: true },
 
