@@ -22,6 +22,7 @@ const commonFields = {
   updatedAt:           { type: String, required: true },
   publicationDate:     { type: String },
   labsPublicationDate: { type: String },
+  unityPackages:       { type: Array },
 }
 
 const WorldsTableSchema = {

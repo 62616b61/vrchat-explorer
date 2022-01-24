@@ -20,6 +20,7 @@ export async function processUnsavedWorld(world) {
     updatedAt: world.updated_at,
     publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
     labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
+    unityPackages: world.unityPackages,
   };
 
   let transaction = {};
