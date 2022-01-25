@@ -83,7 +83,8 @@ export default class MetricsServiceStack extends Stack {
       function: saveWorldStatisticsLambda,
       consumerProps: {
         enabled: true,
-        batchSize: 1,
+        batchSize: 100,
+        maxBatchingWindow: Duration.seconds(60),
       },
     });
   }
