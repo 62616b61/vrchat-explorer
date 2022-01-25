@@ -77,6 +77,7 @@ export default class MetricsServiceStack extends Stack {
         METRICS_DATABASE: timestreamDatabaseName,
         METRICS_TABLE: timestreamTableName,
       },
+      timeout: 30,
     });
 
     worldStatisticsQueue.addConsumer(this, {
