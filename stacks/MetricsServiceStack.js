@@ -2,12 +2,41 @@ import { Stack, Function, Queue } from "@serverless-stack/resources";
 import { CfnDatabase, CfnTable } from "aws-cdk-lib/aws-timestream";
 import * as IAM from "aws-cdk-lib/aws-iam";
 import { SubscriptionFilter } from "aws-cdk-lib/aws-sns";
+import { Duration } from "aws-cdk-lib";
 
 export default class MetricsServiceStack extends Stack {
   constructor(scope, service, props) {
     super(scope, service, props);
 
     const { worldTopic } = props;
+
+    //SQS
+    const worldStatisticsDLQ = new Queue(this, "metrics-service-world-statistics-queue-dlq", {
+      sqsQueue: {
+        retentionPeriod: Duration.seconds(1209600),
+      },
+    });
+
+    const worldStatisticsQueue = new Queue(this, "metrics-service-world-statistics-queue", {
+      sqsQueue: {
+        visibilityTimeout: Duration.seconds(30 * 3),
+        deadLetterQueue: {
+          maxReceiveCount: 3,
+          queue: worldStatisticsDLQ.sqsQueue
+        },
+      },
+    });
+
+    worldTopic.addSubscribers(this, [{
+      queue: worldStatisticsQueue,
+      subscriberProps: {
+        filterPolicy: {
+          type: SubscriptionFilter.stringFilter({
+            whitelist: ["world-statistics"],
+          }),
+        },
+      }
+    }]);
 
     // TIMESTREAM DATABASE
     const timestreamDatabaseName = this.node.root.logicalPrefixedName("metrics-service-metrics");
@@ -40,9 +69,9 @@ export default class MetricsServiceStack extends Stack {
     });
 
     // LAMBDA
-    const saveWorldDataLambda = new Function(this, "metrics-service-save-world-data-lambda", {
-      functionName: this.node.root.logicalPrefixedName("metrics-service-save-world-data"),
-      handler: "src/metrics-service/save-world-data.handler",
+    const saveWorldStatisticsLambda = new Function(this, "metrics-service-save-world-statistics-lambda", {
+      functionName: this.node.root.logicalPrefixedName("metrics-service-save-world-statistics"),
+      handler: "src/metrics-service/save-world-statistics.handler",
       permissions: [timestreamWriteRecordsPolicyStatement, timestreamDescribeEndpointsPolicyStatement],
       environment: {
         METRICS_DATABASE: timestreamDatabaseName,
@@ -50,22 +79,12 @@ export default class MetricsServiceStack extends Stack {
       },
     });
 
-    // QUEUE
-    const metricsServiceWorldQueue = new Queue(this, "metrics-service-world-queue", {
-      consumer: {
-        function: saveWorldDataLambda,
+    worldStatisticsQueue.addConsumer(this, {
+      function: saveWorldStatisticsLambda,
+      consumerProps: {
+        enabled: true,
+        batchSize: 1,
       },
     });
-
-    worldTopic.addSubscribers(this, [{
-      queue: metricsServiceWorldQueue,
-      subscriberProps: {
-        filterPolicy: {
-          type: SubscriptionFilter.stringFilter({
-            whitelist: ["world-statistics"],
-          }),
-        },
-      }
-    }]);
   }
 }

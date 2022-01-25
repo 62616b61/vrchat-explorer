@@ -1,6 +1,7 @@
 import { xor, difference, isEqual, intersectionWith } from 'lodash';
 import { table, Author, Tag, World, WorldHistory } from './connections/dynamodb/Worlds';
 import { publishWorldVersion } from './publish-world-version';
+import { publishWorldStatistics } from './publish-world-statistics';
 
 export async function processSavedWorld(world, savedWorld) {
   const versionHasChanged = !isEqual(world.version, savedWorld.version);
@@ -110,7 +111,8 @@ export async function processSavedWorld(world, savedWorld) {
       throw error;
     }
 
-    return publishWorldVersion(world, previewHasChanged);
+    await publishWorldVersion(world, previewHasChanged);
+    await publishWorldStatistics(world);
   } else {
     //console.log(`World ${world.id} - version unchanged`);
     // TODO: compare tags and other stuff that can change without version changing

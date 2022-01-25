@@ -1,4 +1,5 @@
 import { TimestreamWriteClient, WriteRecordsCommand } from "@aws-sdk/client-timestream-write";
+import { parse } from "../lib/connections/sqs";
 
 const { METRICS_DATABASE, METRICS_TABLE } = process.env;
 const client = new TimestreamWriteClient();
@@ -9,11 +10,13 @@ function record(dimensions, name, value, timestamp) {
     MeasureName: name,
     MeasureValue: String(value),
     MeasureValueType: 'BIGINT',
-    Time: timestamp
+    Time: timestamp,
   };
 }
 
-async function writeToTimestream(world, timestamp) {
+async function processMessage(world) {
+  const timestamp = world.timestamp;
+
   const dimensions = [
     {
       Name: 'id',
@@ -22,7 +25,7 @@ async function writeToTimestream(world, timestamp) {
     {
       Name: 'authorId',
       Value: world.authorId
-    }
+    },
   ];
 
   const records = [
@@ -38,7 +41,7 @@ async function writeToTimestream(world, timestamp) {
   const params = {
     DatabaseName: METRICS_DATABASE,
     TableName: METRICS_TABLE,
-    Records: records
+    Records: records,
   };
 
   const command = new WriteRecordsCommand(params);
@@ -46,20 +49,11 @@ async function writeToTimestream(world, timestamp) {
 }
 
 export async function handler(event) {
-  try {
-    const promises = event.Records.map(record => {
-      const body = JSON.parse(record.body)
+  const messages = parse(event);
 
-      const world = JSON.parse(body.Message);
-      const timestamp = body.MessageAttributes.timestamp.Value;
-
-      return writeToTimestream(world, timestamp);
-    });
-
-    await Promise.all(promises);
-
-    return { statusCode: 200 };
-  } catch (e) {
-    console.log(e);
+  for (const message of messages) {
+    await processMessage(message);
   }
+
+  return { statusCode: 200 };
 }

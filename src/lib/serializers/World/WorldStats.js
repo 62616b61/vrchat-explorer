@@ -9,5 +9,6 @@ export function serialize(world) {
     publicOccupants: world.publicOccupants,
     privateOccupants: world.privateOccupants,
     occupants: world.occupants,
+    timestamp: world.timestamp,
   };
 }

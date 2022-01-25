@@ -136,6 +136,7 @@ export async function handler(event) {
   } catch (error) {
     console.log(error);
     console.log(error.response.data);
+    throw error;
   }
 
   return { statusCode: 200 };
