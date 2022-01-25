@@ -112,10 +112,11 @@ export async function processSavedWorld(world, savedWorld) {
     }
 
     await publishWorldVersion(world, previewHasChanged);
-    await publishWorldStatistics(world);
   } else {
     //console.log(`World ${world.id} - version unchanged`);
     // TODO: compare tags and other stuff that can change without version changing
   }
+
+  await publishWorldStatistics(world);
 }
 
