@@ -45,7 +45,7 @@ export default class VRChatAuthServiceStack extends Stack {
     });
 
     const vrchatAuthApi = new Api(this, "vrchat-auth-service-api", {
-      //...(!IS_LOCAL && { defaultAuthorizationType: ApiAuthorizationType.AWS_IAM }),
+      ...(!IS_LOCAL && { defaultAuthorizationType: ApiAuthorizationType.AWS_IAM }),
       accessLog: false,
       routes: {
         "GET /session": getSessionLambda,

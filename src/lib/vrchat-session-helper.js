@@ -1,5 +1,6 @@
 import vrchat from 'vrchat';
 import axios from 'axios';
+import { aws4Interceptor } from "aws4-axios";
 
 const { VRCHAT_AUTH_API_URL } = process.env;
 const VRCHAT_API_URL = "https://api.vrchat.cloud";
@@ -12,9 +13,19 @@ async function sessionInitialized() {
 
 async function retrieveSession() {
   let session;
+
   try {
     console.log("RETRIEVING SESSION FROM VRCHAT-AUTH-SERVICE")
-    const response = await axios.get(`${VRCHAT_AUTH_API_URL}/session`);
+
+    const client = axios.create();
+    const interceptor = aws4Interceptor({
+      region: "us-east-1",
+      service: "execute-api",
+    });
+
+    client.interceptors.request.use(interceptor);
+
+    const response = await client.get(`${VRCHAT_AUTH_API_URL}/session`);
 
     session = response.data;
   } catch (error) {
