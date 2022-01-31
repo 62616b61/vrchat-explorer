@@ -1,4 +1,4 @@
-import { ApiAuthorizationType, Api, Stack, Cron, Function, Table, TableFieldType, Topic } from "@serverless-stack/resources";
+import { ApiAuthorizationType, Api, Stack, Cron, Function, Table, TableFieldType } from "@serverless-stack/resources";
 import { RemovalPolicy } from "aws-cdk-lib";
 
 const { VRCHAT_USERNAME, VRCHAT_PASSWORD, IS_LOCAL } = process.env;
@@ -11,18 +11,17 @@ export default class VRChatAuthServiceStack extends Stack {
       fields: {
         PK: TableFieldType.STRING,
         SK: TableFieldType.STRING,
-        GSI1PK: TableFieldType.STRING,
-        GSI1SK: TableFieldType.STRING,
       },
       primaryIndex: { partitionKey: "PK", sortKey: "SK" },
-      globalIndexes: {
-        GSI1: { partitionKey: "GSI1PK", sortKey: "GSI1SK" },
+      dynamodbTable: {
+        timeToLiveAttribute: "TTL",
+
+        // IF LOCAL TABLE
+        ...( IS_LOCAL && {
+          pointInTimeRecovery: false,
+          removalPolicy: RemovalPolicy.DESTROY
+        }),
       },
-      ...(
-        IS_LOCAL
-          ? { dynamodbTable: { removalPolicy: RemovalPolicy.DESTROY } }
-          : {}
-      ),
     });
 
     const createSessionLambda = new Function(this, "vrchat-auth-service-create-session-lambda", {
@@ -45,22 +44,23 @@ export default class VRChatAuthServiceStack extends Stack {
       },
     });
 
-    // TODO: disable api logging
     const vrchatAuthApi = new Api(this, "vrchat-auth-service-api", {
-      // TODO: enable authorization on prod env (needs testing)
-      //defaultAuthorizationType: ApiAuthorizationType.AWS_IAM,
+      ...(!IS_LOCAL && { defaultAuthorizationType: ApiAuthorizationType.AWS_IAM }),
       accessLog: false,
       routes: {
         "GET /session": getSessionLambda,
       },
     });
 
-    //if (!IS_LOCAL) {
-      //new Cron(this, "schedule_inspect_world_1m", {
-        //schedule: "rate(1 minute)",
-        //job: inspectWorldLambda
-      //});
-    //}
+    if (!IS_LOCAL) {
+      // Create new session every 24 hours
+      new Cron(this, "create-session-24h-trigger", {
+        schedule: "rate(24 hours)",
+        job: {
+          function: createSessionLambda,
+        },
+      });
+    }
     
     this.vrchatAuthApi = vrchatAuthApi;
   }
