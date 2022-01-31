@@ -10,13 +10,13 @@ const CredentialsTableSchema = {
   version: '0.0.1',
   indexes: {
     primary: { hash: 'PK', sort: 'SK' },
-    GSI1:    { hash: 'GSI1PK', sort: 'GSI1SK' },
   },
 
   models: {
     Session: {
       PK:       { type: String, value: 'USERNAME:${username}' },
-      SK:       { type: String, value: '${auth}:${apiKey}:${bearer}' },
+      SK:       { type: String, generate: 'ulid' },
+      TTL:      { type: Number, ttl: true },
       username: { type: String, required: true },
       auth:     { type: String, required: true },
       apiKey:   { type: String, required: true },
@@ -25,8 +25,8 @@ const CredentialsTableSchema = {
   },
 
   params: {
-    'isoDates': true,
-    'timestamps': true,
+    isoDates: true,
+    timestamps: true,
   },
 }
 
