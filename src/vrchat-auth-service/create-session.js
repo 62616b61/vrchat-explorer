@@ -5,6 +5,20 @@ import { Session } from './lib/connections/dynamodb/Credentials';
 const { VRCHAT_USERNAME, VRCHAT_PASSWORD } = process.env;
 const VRCHAT_API_URL = "https://api.vrchat.cloud";
 
+function getTTL() {
+  const today = new Date();
+  const tomorrow = new Date();
+
+  // add 1 Day
+  tomorrow.setDate(today.getDate() + 1);
+
+  // translate to unix seconds
+  const millis = tomorrow.getTime();
+  const seconds = Math.floor(millis / 1000);
+
+  return seconds;
+}
+
 export async function handler() {
   const configuration = new vrchat.Configuration({
       username: VRCHAT_USERNAME,
@@ -27,7 +41,8 @@ export async function handler() {
     username: VRCHAT_USERNAME,
     auth,
     apiKey,
-    bearer
+    bearer,
+    TTL: getTTL(),
   });
 
   return { statusCode: 200 };
