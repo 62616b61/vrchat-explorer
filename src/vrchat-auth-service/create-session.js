@@ -21,8 +21,8 @@ function getTTL() {
 
 export async function handler() {
   const configuration = new vrchat.Configuration({
-      username: VRCHAT_USERNAME,
-      password: VRCHAT_PASSWORD,
+    username: VRCHAT_USERNAME,
+    password: VRCHAT_PASSWORD,
   });
 
   const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
@@ -37,13 +37,20 @@ export async function handler() {
 
   // TODO: clear local cookie jar after saving the session
   // to prevent errors when executing this function again before new coldstart
-  await Session.create({
-    username: VRCHAT_USERNAME,
-    auth,
-    apiKey,
-    bearer,
-    TTL: getTTL(),
-  });
+  try {
+    await Session.create({
+      username: VRCHAT_USERNAME,
+      auth,
+      apiKey,
+      bearer,
+      TTL: getTTL(),
+    });
+  } catch (error) {
+    console.log("error message", error.message);
+    console.log("error code", error.code);
+    console.log("error context", error.context);
+    throw error;
+  }
 
   return { statusCode: 200 };
 }
