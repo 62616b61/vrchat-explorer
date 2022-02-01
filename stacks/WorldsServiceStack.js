@@ -47,6 +47,34 @@ export default class WorldsServiceStack extends Stack {
       }
     }]);
 
+    // REPROCESS WORLDS QUEUE
+    const reprocessWorldsDLQ = new Queue(this, "worlds-service-reprocess-worlds-queue-dlq", {
+      sqsQueue: {
+        retentionPeriod: Duration.seconds(1209600),
+      },
+    });
+
+    const reprocessWorldsQueue = new Queue(this, "worlds-service-reprocess-worlds-queue", {
+      sqsQueue: {
+        visibilityTimeout: Duration.seconds(30 * 3),
+        deadLetterQueue: {
+          maxReceiveCount: 3,
+          queue: reprocessWorldsDLQ.sqsQueue
+        },
+      },
+    });
+
+    worldTopic.addSubscribers(this, [{
+      queue: reprocessWorldsQueue,
+      subscriberProps: {
+        filterPolicy: {
+          type: SubscriptionFilter.stringFilter({
+            whitelist: ["world-reprocess"],
+          }),
+        },
+      }
+    }]);
+
     // WORLD PREVIEWS QUEUE
     const saveWorldPreviewDLQ = new Queue(this, "worlds-service-save-world-preview-dlq", {
       sqsQueue: {
@@ -117,9 +145,18 @@ export default class WorldsServiceStack extends Stack {
         WORLD_TOPIC: worldTopic.topicArn,
       },
       timeout: 30,
+      reservedConcurrentExecutions: 5,
     });
 
     discoveredWorldsQueue.addConsumer(this, {
+      function: processWorldsLambda,
+      consumerProps: {
+        enabled: true,
+        batchSize: 1,
+      },
+    });
+
+    reprocessWorldsQueue.addConsumer(this, {
       function: processWorldsLambda,
       consumerProps: {
         enabled: true,
@@ -138,6 +175,7 @@ export default class WorldsServiceStack extends Stack {
           WORLDS_TABLE: worldsTable.tableName,
         },
         timeout: 30,
+        reservedConcurrentExecutions: 2,
       });
 
       worldsTable.addConsumers(this, {
@@ -151,35 +189,85 @@ export default class WorldsServiceStack extends Stack {
           },
         },
       });
+
+      // Save world images and thumbnails
+      const saveWorldPreviewImageLambda = new Function(this, "worlds-service-save-world-preview-image-lambda", {
+        functionName: this.node.root.logicalPrefixedName("worlds-service-save-world-preview-image"),
+        handler: "src/worlds-service/save-world-preview-image.handler",
+        permissions: [worldImagesBucket],
+        environment: {
+          WORLD_IMAGES_BUCKET: worldImagesBucket.bucketName,
+        },
+        reservedConcurrentExecutions: 1,
+      });
+
+      saveWorldPreviewQueue.addConsumer(this, {
+        function: saveWorldPreviewImageLambda,
+        consumerProps: {
+          enabled: true,
+          batchSize: 1,
+        },
+      });
     }
 
-    // Save world images and thumbnails
-    const saveWorldPreviewImageLambda = new Function(this, "worlds-service-save-world-preview-image-lambda", {
-      functionName: this.node.root.logicalPrefixedName("worlds-service-save-world-preview-image"),
-      handler: "src/worlds-service/save-world-preview-image.handler",
-      permissions: [worldImagesBucket],
-      environment: {
-        WORLD_IMAGES_BUCKET: worldImagesBucket.bucketName,
-      },
-    });
-
-    saveWorldPreviewQueue.addConsumer(this, {
-      function: saveWorldPreviewImageLambda,
-      consumerProps: {
-        enabled: true,
-        batchSize: 1,
-      },
-    });
-
     // Periodically trigger inspection of worlds
-    //const triggerInspectWorldsLambda = new Function(this, "worlds-service-trigger-inspect-lambda", {
-      //functionName: this.node.root.logicalPrefixedName("worlds-service-trigger-inspect"),
-      //handler: "src/worlds-service/trigger-inspect.handler",
-      //permissions: [worldsTable],
-      //environment: {
-        //WORLDS_TABLE: worldsTable.tableName,
-      //}
-    //});
+    const triggerWorldReprocessLambda = new Function(this, "worlds-service-trigger-world-reprocess-lambda", {
+      functionName: this.node.root.logicalPrefixedName("worlds-service-trigger-world-reprocess"),
+      handler: "src/worlds-service/trigger-world-reprocess.handler",
+      permissions: [worldsTable, worldTopic],
+      environment: {
+        PUBLISH_BATCH_SIZE: "25",
+        WORLDS_TABLE: worldsTable.tableName,
+        WORLD_TOPIC: worldTopic.topicArn,
+      },
+    });
+
+    if (!IS_LOCAL) {
+      // Trigger world reprocess with 24h schedule
+      new Cron(this, "world-reprocess-24h-trigger", {
+        schedule: "rate(24 hours)",
+        job: {
+          function: triggerWorldReprocessLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              releaseStatus: 'public',
+              status: 'enabled',
+              schedule: '24h',
+            }),
+          },
+        },
+      });
+
+      // Trigger world reprocess with 6h schedule
+      new Cron(this, "world-reprocess-6h-trigger", {
+        schedule: "rate(6 hours)",
+        job: {
+          function: triggerWorldReprocessLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              releaseStatus: 'public',
+              status: 'enabled',
+              schedule: '6h',
+            }),
+          },
+        },
+      });
+
+      // Trigger world reprocess with 1h schedule
+      new Cron(this, "world-reprocess-1h-trigger", {
+        schedule: "rate(1 hour)",
+        job: {
+          function: triggerWorldReprocessLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              releaseStatus: 'public',
+              status: 'enabled',
+              schedule: '1h',
+            }),
+          },
+        },
+      });
+    }
     
     this.worldTopic = worldTopic;
   }
