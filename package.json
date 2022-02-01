@@ -23,6 +23,7 @@
     "@serverless-stack/cli": "0.59.1",
     "@serverless-stack/resources": "0.59.1",
     "dynamodb-onetable": "^2.3.0",
+    "aws4-axios": "^2.4.6",
     "lodash": "^4.17.21",
     "vrchat": "^1.6.5"
   },
