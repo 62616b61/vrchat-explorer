@@ -145,7 +145,7 @@ export default class WorldsServiceStack extends Stack {
         WORLD_TOPIC: worldTopic.topicArn,
       },
       timeout: 30,
-      reservedConcurrentExecutions: 5,
+      //reservedConcurrentExecutions: 5,
     });
 
     discoveredWorldsQueue.addConsumer(this, {
@@ -175,7 +175,7 @@ export default class WorldsServiceStack extends Stack {
           WORLDS_TABLE: worldsTable.tableName,
         },
         timeout: 30,
-        reservedConcurrentExecutions: 2,
+        //reservedConcurrentExecutions: 2,
       });
 
       worldsTable.addConsumers(this, {
@@ -198,7 +198,7 @@ export default class WorldsServiceStack extends Stack {
         environment: {
           WORLD_IMAGES_BUCKET: worldImagesBucket.bucketName,
         },
-        reservedConcurrentExecutions: 1,
+        //reservedConcurrentExecutions: 1,
       });
 
       saveWorldPreviewQueue.addConsumer(this, {
@@ -222,7 +222,7 @@ export default class WorldsServiceStack extends Stack {
       },
     });
 
-    if (!IS_LOCAL) {
+    if (false && !IS_LOCAL) {
       // Trigger world reprocess with 24h schedule
       new Cron(this, "world-reprocess-24h-trigger", {
         schedule: "rate(24 hours)",
