@@ -17,25 +17,16 @@ export default class MetricsServiceStack extends Stack {
     const { worldTopic } = props;
 
     // S3
-    const {
-      timestreamScheduledQueryErrorReportingBucket,
-    } = s3(this);
+    const { timestreamScheduledQueryErrorReportingBucket } = s3(this);
 
     // SNS
-    const {
-      timestreamScheduledQueryResultsTopic,
-    } = sns(this);
+    const { timestreamScheduledQueryResultsTopic } = sns(this);
 
     //SQS
-    const {
-      worldStatisticsQueue,
-    } = sqs(this, { worldTopic });
+    const { worldStatisticsQueue } = sqs(this, { worldTopic });
 
     // TIMESTREAM
-    const {
-      metricsDatabase,
-      metricsTable,
-    } = timestream(this);
+    const { metricsDatabase, metricsTable } = timestream(this);
 
     // IAM
     const {
