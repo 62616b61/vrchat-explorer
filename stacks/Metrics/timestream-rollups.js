@@ -44,7 +44,7 @@ export default function timestreamRollups(scope, {
       rollupTarget: target,
       rollupPeriod: '24h',
       rollupAgo: '24h',
-      scheduleExpression: 'rate(5 minutes)',
+      scheduleExpression: 'rate(12 hours)',
     };
 
     const { scheduledQuery } = timestreamScheduledQuery(scope, options);
