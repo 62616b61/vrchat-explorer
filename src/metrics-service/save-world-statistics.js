@@ -36,7 +36,7 @@ async function processMessages(worlds) {
       record(dimensions, 'heat', world.heat, timestamp),
       record(dimensions, 'publicOccupants', world.publicOccupants, timestamp),
       record(dimensions, 'privateOccupants', world.privateOccupants, timestamp),
-      record(dimensions, 'occupants', world.occupants, timestamp),
+      //record(dimensions, 'occupants', world.occupants, timestamp),
     ];
   });
 
