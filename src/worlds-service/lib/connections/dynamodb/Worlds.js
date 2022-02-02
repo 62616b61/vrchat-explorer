@@ -30,7 +30,7 @@ const WorldsTableSchema = {
   indexes: {
     primary: { hash: 'PK', sort: 'SK' },
     GSI1:    { hash: 'GSI1PK', sort: 'GSI1SK' },
-    LSI1:    { local: true, sort: 'SK2' },
+    LSI1:    { type: 'local', sort: 'SK2' },
   },
 
   models: {
