@@ -1,4 +1,4 @@
-import vrchat from 'vrchat';
+import * as vrchat from 'vrchat';
 import { parse } from '../lib/connections/sqs';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
 import { World } from './lib/connections/dynamodb/Worlds';

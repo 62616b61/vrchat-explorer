@@ -1,4 +1,4 @@
-import vrchat from 'vrchat';
+import * as vrchat from 'vrchat';
 import axios from 'axios';
 import { aws4Interceptor } from "aws4-axios";
 
@@ -36,6 +36,8 @@ async function retrieveSession() {
   if (!session) {
     throw new Error('Received empty session from vrchat-auth-service.');
   }
+
+  console.log(`RETRIEVED VRCHAT SESSION (username, SK): (${session.username}, ${session.SK})`);
 
   return session;
 }

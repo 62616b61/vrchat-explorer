@@ -1,4 +1,4 @@
-import vrchat from 'vrchat';
+import * as vrchat from 'vrchat';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
 import { serialize } from '../lib/serializers/World/DiscoveredWorld';
 import { publish } from '../lib/connections/sns';

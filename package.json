@@ -20,14 +20,14 @@
     "@aws-sdk/client-sns": "^3.47.0",
     "@aws-sdk/client-timestream-write": "^3.47.0",
     "@aws-sdk/lib-storage": "^3.47.0",
-    "@serverless-stack/cli": "0.59.1",
-    "@serverless-stack/resources": "0.59.1",
-    "dynamodb-onetable": "^2.3.0",
+    "@serverless-stack/cli": "^0.60.11",
+    "@serverless-stack/resources": "^0.60.11",
     "aws4-axios": "^2.4.6",
+    "dynamodb-onetable": "^2.3.0",
     "lodash": "^4.17.21",
-    "vrchat": "^1.6.5"
+    "vrchat": "^1.6.9"
   },
   "devDependencies": {
-    "aws-cdk-lib": "2.7.0"
+    "aws-cdk-lib": "^2.10.0"
   }
 }
