@@ -53,9 +53,9 @@ export default class VRChatAuthServiceStack extends Stack {
     });
 
     if (!IS_LOCAL) {
-      // Create new session every 24 hours
-      new Cron(this, "create-session-24h-trigger", {
-        schedule: "rate(24 hours)",
+      // Create new session every 6 hours
+      new Cron(this, "create-session-6h-trigger", {
+        schedule: "rate(6 hours)",
         job: {
           function: createSessionLambda,
         },
