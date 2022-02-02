@@ -15,8 +15,6 @@ async function retrieveSession() {
   let session;
 
   try {
-    console.log("RETRIEVING SESSION FROM VRCHAT-AUTH-SERVICE")
-
     const client = axios.create();
     const interceptor = aws4Interceptor({
       region: "us-east-1",
