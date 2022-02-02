@@ -8,7 +8,7 @@ export function serialize(world) {
     heat: world.heat,
     publicOccupants: world.publicOccupants,
     privateOccupants: world.privateOccupants,
-    occupants: world.occupants,
+    //occupants: world.occupants,
     timestamp: world.timestamp,
   };
 }
