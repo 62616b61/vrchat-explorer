@@ -91,14 +91,14 @@ export async function processSavedWorld(world, savedWorld) {
       { transaction },
     );
 
-    const addedTags = difference(world.tags, savedWorld.tags);
-    await Promise.all(addedTags.map((tag) => Tag.create({ tag, ...commonFields }, { transaction })));
+    //const addedTags = difference(world.tags, savedWorld.tags);
+    //await Promise.all(addedTags.map((tag) => Tag.create({ tag, ...commonFields }, { transaction })));
 
-    const removedTags = difference(savedWorld.tags, world.tags);
-    await Promise.all(removedTags.map((tag) => Tag.remove({ tag, ...commonFields }, { transaction })));
+    //const removedTags = difference(savedWorld.tags, world.tags);
+    //await Promise.all(removedTags.map((tag) => Tag.remove({ tag, ...commonFields }, { transaction })));
 
-    const unchangedTags = intersectionWith(world.tags, savedWorld.tags, isEqual);
-    await Promise.all(unchangedTags.map((tag) => Tag.update({ tag, ...commonFields }, { transaction, exists: null })));
+    //const unchangedTags = intersectionWith(world.tags, savedWorld.tags, isEqual);
+    //await Promise.all(unchangedTags.map((tag) => Tag.update({ tag, ...commonFields }, { transaction, exists: null })));
 
     try {
       await table.transact("write", transaction);

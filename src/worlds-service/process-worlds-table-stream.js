@@ -100,14 +100,14 @@ export async function handler(event) {
   }
 
   // TAG RECORDS
-  const tagRecords = event.Records.filter(record => {
-    const { PK, SK } = extractPKandSK(record);
-    return PK.startsWith("TAG:") && !SK.startsWith("METADATA");
-  });
+  //const tagRecords = event.Records.filter(record => {
+    //const { PK, SK } = extractPKandSK(record);
+    //return PK.startsWith("TAG:") && !SK.startsWith("METADATA");
+  //});
 
-  for (const { PK, count } of prepareRecords(tagRecords)) {
-    await handleTagEvent({ PK, transaction, count });
-  }
+  //for (const { PK, count } of prepareRecords(tagRecords)) {
+    //await handleTagEvent({ PK, transaction, count });
+  //}
 
   // AUTHOR RECORDS
   const authorRecords = event.Records.filter(record => {

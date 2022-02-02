@@ -57,7 +57,7 @@ export async function processUnsavedWorld(world) {
     { transaction },
   );
 
-  await Promise.all(world.tags.map((tag) => Tag.create({ tag, ...commonFields }, { transaction })));
+  //await Promise.all(world.tags.map((tag) => Tag.create({ tag, ...commonFields }, { transaction })));
 
   try {
     await table.transact("write", transaction);
