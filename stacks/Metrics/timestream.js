@@ -10,7 +10,7 @@ export default function timestream(scope) {
     databaseName: metricsDatabase.databaseName,
     retentionProperties: {
       MemoryStoreRetentionPeriodInHours: "1",
-      MagneticStoreRetentionPeriodInDays: "2",
+      MagneticStoreRetentionPeriodInDays: "3",
     },
   });
 

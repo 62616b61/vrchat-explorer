@@ -23,8 +23,8 @@ export default function timestreamRollups(scope, {
       destinationTableName: metricsTableRollup_1h.tableName,
       rollupTarget: target,
       rollupPeriod: '1h',
-      rollupAgo: '1h',
-      scheduleExpression: 'rate(15 minutes)',
+      rollupAgo: '2h',
+      scheduleExpression: 'rate(30 minutes)',
     };
 
     const { scheduledQuery } = timestreamScheduledQuery(scope, options);
@@ -43,7 +43,7 @@ export default function timestreamRollups(scope, {
       destinationTableName: metricsTableRollup_24h.tableName,
       rollupTarget: target,
       rollupPeriod: '24h',
-      rollupAgo: '24h',
+      rollupAgo: '48h',
       scheduleExpression: 'rate(12 hours)',
     };
 
