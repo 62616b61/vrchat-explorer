@@ -29,7 +29,7 @@ export async function processSavedWorld(world, savedWorld) {
       labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
     };
 
-    let transaction = {};
+    //let transaction = {};
 
     await World.update(
       {
@@ -54,7 +54,7 @@ export async function processSavedWorld(world, savedWorld) {
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
       },
-      { transaction },
+      //{ transaction },
     );
 
     await WorldHistory.create(
@@ -66,7 +66,7 @@ export async function processSavedWorld(world, savedWorld) {
         unityPackages: world.unityPackages,
         ...commonFields,
       },
-      { transaction },
+      //{ transaction },
     );
 
     await Author.update(
@@ -88,7 +88,7 @@ export async function processSavedWorld(world, savedWorld) {
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
       },
-      { transaction },
+      //{ transaction },
     );
 
     //const addedTags = difference(world.tags, savedWorld.tags);
@@ -100,16 +100,16 @@ export async function processSavedWorld(world, savedWorld) {
     //const unchangedTags = intersectionWith(world.tags, savedWorld.tags, isEqual);
     //await Promise.all(unchangedTags.map((tag) => Tag.update({ tag, ...commonFields }, { transaction, exists: null })));
 
-    try {
-      await table.transact("write", transaction);
-    } catch (error) {
-      console.log("error message", error.message);
-      console.log("error code", error.code);
-      console.log("error context", error.context);
-      console.log("cancellation reasons", error.context.err.CancellationReasons);
-      console.log("world", world);
-      throw error;
-    }
+    //try {
+      //await table.transact("write", transaction);
+    //} catch (error) {
+      //console.log("error message", error.message);
+      //console.log("error code", error.code);
+      //console.log("error context", error.context);
+      //console.log("cancellation reasons", error.context.err.CancellationReasons);
+      //console.log("world", world);
+      //throw error;
+    //}
 
     await publishWorldVersion(world, previewHasChanged);
   } else {

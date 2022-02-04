@@ -23,7 +23,7 @@ export async function processUnsavedWorld(world) {
     labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
   };
 
-  let transaction = {};
+  //let transaction = {};
 
   await World.create(
     {
@@ -37,7 +37,7 @@ export async function processUnsavedWorld(world) {
       unityPackages: world.unityPackages,
       ...commonFields,
     },
-    { transaction },
+    //{ transaction },
   );
 
   await WorldHistory.create(
@@ -49,24 +49,24 @@ export async function processUnsavedWorld(world) {
       unityPackages: world.unityPackages,
       ...commonFields,
     },
-    { transaction },
+    //{ transaction },
   );
 
   await Author.create(
     { ...commonFields },
-    { transaction },
+    //{ transaction },
   );
 
   //await Promise.all(world.tags.map((tag) => Tag.create({ tag, ...commonFields }, { transaction })));
 
-  try {
-    await table.transact("write", transaction);
-  } catch (error) {
-    console.log("error message", error.message);
-    console.log("error code", error.code);
-    console.log("error context", error.context);
-    console.log("cancellation reasons", error.context.err.CancellationReasons);
-  }
+  //try {
+    //await table.transact("write", transaction);
+  //} catch (error) {
+    //console.log("error message", error.message);
+    //console.log("error code", error.code);
+    //console.log("error context", error.context);
+    //console.log("cancellation reasons", error.context.err.CancellationReasons);
+  //}
 
   await publishWorldVersion(world, true);
   await publishWorldStatistics(world);
