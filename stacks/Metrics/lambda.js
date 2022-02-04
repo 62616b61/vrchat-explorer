@@ -18,6 +18,7 @@ export default function lambda(scope, {
       METRICS_TABLE: metricsTableRaw.tableName,
     },
     timeout: 30,
+    reservedConcurrentExecutions: 2,
   });
 
   worldStatisticsQueue.addConsumer(this, {
