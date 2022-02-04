@@ -39,7 +39,6 @@ async function loadWorlds({ parameters, next } = DEFAULT_ARGUMENTS) {
     const attributes = getSNSAttributes(parameters);
     const message = worlds.map(world => serialize(world));
 
-
     const parts = chunk(message, String(PUBLISH_BATCH_SIZE));
     await Promise.all(
       parts.map(part => publish(WORLD_TOPIC, part, attributes))

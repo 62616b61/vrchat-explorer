@@ -222,7 +222,7 @@ export default class WorldsServiceStack extends Stack {
       },
     });
 
-    if (false && !IS_LOCAL) {
+    if (!IS_LOCAL) {
       // Trigger world reprocess with 24h schedule
       new Cron(this, "world-reprocess-24h-trigger", {
         schedule: "rate(24 hours)",
