@@ -22,6 +22,7 @@
     "@aws-sdk/lib-storage": "^3.47.0",
     "@serverless-stack/cli": "^0.60.11",
     "@serverless-stack/resources": "^0.60.11",
+    "await-sleep": "^0.0.1",
     "aws4-axios": "^2.4.6",
     "dynamodb-onetable": "^2.3.0",
     "lodash": "^4.17.21",

@@ -1,11 +1,24 @@
 import * as vrchat from 'vrchat';
+import sleep from 'await-sleep';
 import { parse } from '../lib/connections/sqs';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
 import { World } from './lib/connections/dynamodb/Worlds';
 import { processSavedWorld } from './lib/world/process-saved-world';
 import { processUnsavedWorld } from './lib/world/process-unsaved-world';
 
-async function processMessage(message) {
+async function processMessage(message, retry = 0) {
+  if (retry > 3) {
+    console.log('Retried 3 times. Dropping message.');
+    return;
+  }
+
+  if (retry > 0) {
+    const duration = 250 * retry;
+
+    console.log(`Sleeping for ${duration}.`);
+    await sleep(duration);
+  }
+
   console.log(`World ${message.id} - start processing`)
 
   const savedWorld = message.version
@@ -32,9 +45,14 @@ async function processMessage(message) {
       // error.response = status: 429, statusText: 'Too Many Requests',
       // error.response.data = { error: 'slow down', status_code: 429 }
       if (error.response.status === 429) {
-        // TODO: send removal request
+        // TODO: add retry logic
         console.log("Too many requests");
-        return;
+        return processMessage(message, retry + 1);
+      }
+
+      if (error.response.status === 502) {
+        console.log("Bad Gateway");
+        return processMessage(message, retry + 1);
       }
 
       if (error.isAxiosError) {
