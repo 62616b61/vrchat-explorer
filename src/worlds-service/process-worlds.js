@@ -45,7 +45,6 @@ async function processMessage(message, retry = 0) {
       // error.response = status: 429, statusText: 'Too Many Requests',
       // error.response.data = { error: 'slow down', status_code: 429 }
       if (error.response.status === 429) {
-        // TODO: add retry logic
         console.log("Too many requests");
         return processMessage(message, retry + 1);
       }
