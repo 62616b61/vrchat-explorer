@@ -13,7 +13,7 @@ export async function processSavedWorld(world, savedWorld) {
 
     const commonFields = WorldCommonFields(world);
 
-    let batch = {};
+    //let batch = {};
 
     await World.update(
       {
@@ -38,7 +38,7 @@ export async function processSavedWorld(world, savedWorld) {
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
       },
-      { batch },
+      //{ batch },
     );
 
     await WorldHistory.create(
@@ -50,7 +50,7 @@ export async function processSavedWorld(world, savedWorld) {
         unityPackages: world.unityPackages,
         ...commonFields,
       },
-      { batch },
+      //{ batch },
     );
 
     await Author.update(
@@ -72,7 +72,7 @@ export async function processSavedWorld(world, savedWorld) {
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
       },
-      { batch },
+      //{ batch },
     );
 
     //const addedTags = difference(world.tags, savedWorld.tags);
@@ -84,16 +84,16 @@ export async function processSavedWorld(world, savedWorld) {
     //const unchangedTags = intersectionWith(world.tags, savedWorld.tags, isEqual);
     //await Promise.all(unchangedTags.map((tag) => Tag.update({ tag, ...commonFields }, { transaction, exists: null })));
 
-    try {
-      await table.batchWrite(batch);
-    } catch (error) {
-      console.log("error message", error);
-      //console.log("error code", error.code);
-      //console.log("error context", error.context);
-      //console.log("cancellation reasons", error.context.err.CancellationReasons);
-      console.log("world", world);
-      throw error;
-    }
+    //try {
+      //await table.batchWrite(batch);
+    //} catch (error) {
+      //console.log("error message", error);
+      ////console.log("error code", error.code);
+      ////console.log("error context", error.context);
+      ////console.log("cancellation reasons", error.context.err.CancellationReasons);
+      //console.log("world", world);
+      //throw error;
+    //}
 
     await publishWorldVersion(world, previewHasChanged);
   } else {
