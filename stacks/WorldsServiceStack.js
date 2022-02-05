@@ -268,6 +268,21 @@ export default class WorldsServiceStack extends Stack {
           },
         },
       });
+
+      // Trigger world reprocess with 10m schedule
+      new Cron(this, "world-reprocess-10m-trigger", {
+        schedule: "rate(10 minutes)",
+        job: {
+          function: triggerWorldReprocessLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              releaseStatus: 'public',
+              status: 'enabled',
+              schedule: '10m',
+            }),
+          },
+        },
+      });
     }
     
     this.worldTopic = worldTopic;
