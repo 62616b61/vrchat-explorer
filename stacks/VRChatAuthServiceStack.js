@@ -1,4 +1,4 @@
-import { ApiAuthorizationType, Api, Stack, Cron, Function, Table, TableFieldType } from "@serverless-stack/resources";
+import { ApiAuthorizationType, Api, Script, Stack, Cron, Function, Table, TableFieldType } from "@serverless-stack/resources";
 import { RemovalPolicy } from "aws-cdk-lib";
 
 const { VRCHAT_USERNAME, VRCHAT_PASSWORD, IS_LOCAL } = process.env;
@@ -51,6 +51,25 @@ export default class VRChatAuthServiceStack extends Stack {
         "GET /session": getSessionLambda,
       },
     });
+
+    if (IS_LOCAL) {
+      const createSessionLambdaScript = new Function(this, "vrchat-auth-service-create-session-lambda-script", {
+        enableLiveDev: false,
+        functionName: this.node.root.logicalPrefixedName("vrchat-auth-service-create-session-script"),
+        handler: "src/vrchat-auth-service/create-session.handler",
+        permissions: [credentialsTable],
+        environment: {
+          CREDENTIALS_TABLE: credentialsTable.tableName,
+          VRCHAT_USERNAME,
+          VRCHAT_PASSWORD,
+        },
+      });
+
+      new Script(this, "vrchat-auth-service-create-session-script", {
+        onCreate: createSessionLambdaScript,
+        onUpdate: createSessionLambdaScript,
+      });
+    }
 
     if (!IS_LOCAL) {
       // Create new session every 6 hours
