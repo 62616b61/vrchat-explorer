@@ -2,8 +2,8 @@ import * as vrchat from 'vrchat';
 import { parse } from '../lib/connections/sqs';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
 import { World } from './lib/connections/dynamodb/Worlds';
-import { processSavedWorld } from './lib/process-saved-world';
-import { processUnsavedWorld } from './lib/process-unsaved-world';
+import { processSavedWorld } from './lib/world/process-saved-world';
+import { processUnsavedWorld } from './lib/world/process-unsaved-world';
 
 async function processMessage(message) {
   console.log(`World ${message.id} - start processing`)

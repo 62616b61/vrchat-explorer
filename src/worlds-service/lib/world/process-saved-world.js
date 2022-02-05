@@ -1,8 +1,8 @@
 import { xor, difference, isEqual, intersectionWith } from 'lodash';
-import { table, Author, Tag, World, WorldHistory } from './connections/dynamodb/Worlds';
-import { publishWorldVersion } from './publish-world-version';
-import { publishWorldStatistics } from './publish-world-statistics';
-import { WorldCommonFields } from './serializers/WorldCommonFields';
+import { table, Author, Tag, World, WorldHistory } from '../connections/dynamodb/Worlds';
+import { publishWorldVersion } from '../publish/publish-world-version';
+import { publishWorldStatistics } from '../publish/publish-world-statistics';
+import { WorldCommonFields } from '../serializers/WorldCommonFields';
 
 export async function processSavedWorld(world, savedWorld) {
   const versionHasChanged = !isEqual(world.version, savedWorld.version);

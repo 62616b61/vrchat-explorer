@@ -1,7 +1,7 @@
 const { WORLD_TOPIC } = process.env;
 
-import { serialize } from '../../lib/serializers/World/WorldVersion';
-import { publish } from '../../lib/connections/sns';
+import { serialize } from '../../../lib/serializers/World/WorldVersion';
+import { publish } from '../../../lib/connections/sns';
 
 function getSNSAttributes(previewHasChanged) {
   return {

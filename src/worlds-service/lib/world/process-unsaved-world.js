@@ -1,7 +1,7 @@
-import { table, Author, Tag, World, WorldHistory } from './connections/dynamodb/Worlds';
-import { publishWorldVersion } from './publish-world-version';
-import { publishWorldStatistics } from './publish-world-statistics';
-import { WorldCommonFields } from './serializers/WorldCommonFields';
+import { table, Author, Tag, World, WorldHistory } from '../connections/dynamodb/Worlds';
+import { publishWorldVersion } from '../publish/publish-world-version';
+import { publishWorldStatistics } from '../publish/publish-world-statistics';
+import { WorldCommonFields } from '../serializers/WorldCommonFields';
 
 export async function processUnsavedWorld(world) {
   console.log(`World ${world.id} - saving new world`);
