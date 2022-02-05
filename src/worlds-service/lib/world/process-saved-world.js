@@ -87,10 +87,10 @@ export async function processSavedWorld(world, savedWorld) {
     try {
       await table.batchWrite(batch);
     } catch (error) {
-      console.log("error message", error.message);
-      console.log("error code", error.code);
-      console.log("error context", error.context);
-      console.log("cancellation reasons", error.context.err.CancellationReasons);
+      console.log("error message", error);
+      //console.log("error code", error.code);
+      //console.log("error context", error.context);
+      //console.log("cancellation reasons", error.context.err.CancellationReasons);
       console.log("world", world);
       throw error;
     }
