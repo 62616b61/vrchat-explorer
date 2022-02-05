@@ -53,15 +53,16 @@ async function processMessage(message, retry = 0) {
         console.log("Bad Gateway");
         return processMessage(message, retry + 1);
       }
-
-      if (error.isAxiosError) {
-        console.log("RESEPONSE: ", error.response);
-        console.log("RESPONSE DATA: ", error.response.data);
-      } else {
-        console.log("ERROR GENERIC: ", error);
-      }
-      throw error;
     }
+
+    if (error.isAxiosError) {
+      console.log("RESEPONSE: ", error.response);
+      console.log("RESPONSE DATA: ", error.response.data);
+    } else {
+      console.log("ERROR GENERIC: ", error);
+    }
+
+    throw error;
   }
 }
 
