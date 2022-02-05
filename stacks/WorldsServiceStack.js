@@ -145,7 +145,7 @@ export default class WorldsServiceStack extends Stack {
         WORLD_TOPIC: worldTopic.topicArn,
       },
       timeout: 30,
-      reservedConcurrentExecutions: 2,
+      reservedConcurrentExecutions: 1,
     });
 
     discoveredWorldsQueue.addConsumer(this, {
@@ -220,6 +220,7 @@ export default class WorldsServiceStack extends Stack {
         WORLDS_TABLE: worldsTable.tableName,
         WORLD_TOPIC: worldTopic.topicArn,
       },
+      timeout: 30,
     });
 
     if (!IS_LOCAL) {
