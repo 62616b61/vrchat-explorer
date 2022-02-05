@@ -1,3 +1,5 @@
+import { detectPlatforms } from '../world/detect-platforms';
+
 export function WorldCommonFields(world) {
   const commonFields = {
     worldId: world.id,
@@ -16,6 +18,8 @@ export function WorldCommonFields(world) {
     updatedAt: world.updated_at,
     publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
     labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
+
+    platforms: detectPlatforms(world),
   };
 
   return commonFields;
