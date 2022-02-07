@@ -220,7 +220,7 @@ export default class WorldsServiceStack extends Stack {
         WORLDS_TABLE: worldsTable.tableName,
         WORLD_TOPIC: worldTopic.topicArn,
       },
-      timeout: 30,
+      timeout: 600,
     });
 
     if (!IS_LOCAL) {
