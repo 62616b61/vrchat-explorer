@@ -1,8 +1,8 @@
 import { Tracing } from "aws-cdk-lib/aws-lambda";
 
-import VRChatAuthServiceStack from "./VRChatAuthServiceStack";
-import WorldsServiceStack from "./WorldsServiceStack";
-import DiscoveryServiceStack from "./DiscoveryServiceStack";
+import VRChatAuthServiceStack from "./VRChatAuth";
+import DiscoveryServiceStack from "./Discovery";
+import WorldsServiceStack from "./Worlds";
 import MetricsServiceStack from "./Metrics";
 
 export default function main(app) {
