@@ -35,7 +35,7 @@ async function retrieveSession() {
     throw new Error('Received empty session from vrchat-auth-service.');
   }
 
-  console.log(`RETRIEVED VRCHAT SESSION (username, SK): (${session.username}, ${session.SK})`);
+  console.log(`RETRIEVED VRCHAT SESSION (account, SK): (${session.account}, ${session.SK})`);
 
   return session;
 }
@@ -58,11 +58,12 @@ async function authenticateWithVRChat(session) {
 
     const locationCheckError = "It looks like you're logging in from somewhere new! Check your email for a message from VRChat.";
     if (status_code === 401 && message.startsWith(locationCheckError)) {
-      throw new Error(`Email confirmation required for username ${session.username}!`);
+      throw new Error(`Email confirmation required for account ${session.account}!`);
     }
 
     if (status_code === 401) {
       console.log("ERROR", error.response.data);
+      throw error;
       // TODO: send session delete request
     }
   }

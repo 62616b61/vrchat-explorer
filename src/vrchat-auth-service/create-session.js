@@ -1,9 +1,29 @@
-import vrchat from 'vrchat';
+import * as vrchat from "vrchat";
+import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
+import { Session } from "./lib/connections/dynamodb/Credentials";
 
-import { Session } from './lib/connections/dynamodb/Credentials';
-
-const { VRCHAT_USERNAME, VRCHAT_PASSWORD } = process.env;
+const SSM_PARAMETER_PREFIX = "/vrchat/credentials/";
 const VRCHAT_API_URL = "https://api.vrchat.cloud";
+const client = new SSMClient();
+
+async function getSecretCredentials(account) {
+  try {
+    const command = new GetParameterCommand({
+      Name: SSM_PARAMETER_PREFIX + account,
+      WithDecryption: true,
+    });
+
+    const response = await client.send(command);
+    const credentials = response.Parameter.Value;
+
+    return JSON.parse(credentials);
+  } catch (error) {
+    console.log("Error! Couldn't load account credentials parameter.")
+    console.log(error);
+
+    throw error;
+  }
+}
 
 function getTTL() {
   const today = new Date();
@@ -19,11 +39,11 @@ function getTTL() {
   return seconds;
 }
 
-export async function handler() {
-  const configuration = new vrchat.Configuration({
-    username: VRCHAT_USERNAME,
-    password: VRCHAT_PASSWORD,
-  });
+export async function handler(event = {}) {
+  const { account = "account00" } = event;
+  const { username, password } = await getSecretCredentials(account);
+
+  const configuration = new vrchat.Configuration({ username, password });
 
   const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
   const response = await AuthenticationApi.getCurrentUser();
@@ -39,7 +59,7 @@ export async function handler() {
   // to prevent errors when executing this function again before new coldstart
   try {
     await Session.create({
-      username: VRCHAT_USERNAME,
+      account,
       auth,
       apiKey,
       bearer,
