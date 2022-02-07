@@ -14,10 +14,10 @@ const CredentialsTableSchema = {
 
   models: {
     Session: {
-      PK:       { type: String, value: 'USERNAME:${username}' },
+      PK:       { type: String, value: 'ACCOUNT:${account}' },
       SK:       { type: String, generate: 'ulid' },
       TTL:      { type: Number, ttl: true },
-      username: { type: String, required: true },
+      account:  { type: String, required: true },
       auth:     { type: String, required: true },
       apiKey:   { type: String, required: true },
       bearer:   { type: String, required: true },
