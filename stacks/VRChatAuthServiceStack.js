@@ -1,12 +1,16 @@
 import { ApiAuthorizationType, Api, Script, Stack, Cron, Function, Table, TableFieldType } from "@serverless-stack/resources";
 import { RemovalPolicy } from "aws-cdk-lib";
+import { RuleTargetInput } from "aws-cdk-lib/aws-events";
+import { PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 
-const { VRCHAT_USERNAME, VRCHAT_PASSWORD, IS_LOCAL } = process.env;
+const { IS_LOCAL } = process.env;
 
 export default class VRChatAuthServiceStack extends Stack {
   constructor(scope, service, props) {
     super(scope, service, props);
 
+    // DYNAMO
     const credentialsTable = new Table(this, "vrchat-auth-service-credentials", {
       fields: {
         PK: TableFieldType.STRING,
@@ -24,14 +28,32 @@ export default class VRChatAuthServiceStack extends Stack {
       },
     });
 
+    // SSM
+    const accountCredentialsParameter00 = StringParameter.fromSecureStringParameterAttributes(this, "vrchat-auth-service-account-credentials-00-ssm", {
+      parameterName: '/vrchat/credentials/account00',
+    });
+
+    const accountCredentialsParameter01 = StringParameter.fromSecureStringParameterAttributes(this, "vrchat-auth-service-account-credentials-01-ssm", {
+      parameterName: '/vrchat/credentials/account01',
+    });
+
+    // IAM
+    const secretsManagerPolicy = new PolicyStatement({
+      actions: ["ssm:GetParameter"],
+      effect: Effect.ALLOW,
+      resources: [
+        accountCredentialsParameter00.parameterArn,
+        accountCredentialsParameter01.parameterArn,
+      ],
+    });
+
+    // LAMBDA
     const createSessionLambda = new Function(this, "vrchat-auth-service-create-session-lambda", {
       functionName: this.node.root.logicalPrefixedName("vrchat-auth-service-create-session"),
       handler: "src/vrchat-auth-service/create-session.handler",
-      permissions: [credentialsTable],
+      permissions: [credentialsTable, secretsManagerPolicy],
       environment: {
         CREDENTIALS_TABLE: credentialsTable.tableName,
-        VRCHAT_USERNAME,
-        VRCHAT_PASSWORD,
       },
     });
 
@@ -52,16 +74,15 @@ export default class VRChatAuthServiceStack extends Stack {
       },
     });
 
+    // SCRIPT
     if (IS_LOCAL) {
       const createSessionLambdaScript = new Function(this, "vrchat-auth-service-create-session-lambda-script", {
         enableLiveDev: false,
         functionName: this.node.root.logicalPrefixedName("vrchat-auth-service-create-session-script"),
         handler: "src/vrchat-auth-service/create-session.handler",
-        permissions: [credentialsTable],
+        permissions: [credentialsTable, secretsManagerPolicy],
         environment: {
           CREDENTIALS_TABLE: credentialsTable.tableName,
-          VRCHAT_USERNAME,
-          VRCHAT_PASSWORD,
         },
       });
 
@@ -71,12 +92,30 @@ export default class VRChatAuthServiceStack extends Stack {
       });
     }
 
+    // SCHEDULE
     if (!IS_LOCAL) {
       // Create new session every 6 hours
-      new Cron(this, "create-session-6h-trigger", {
+      new Cron(this, "create-account00-session-6h-trigger", {
         schedule: "rate(6 hours)",
         job: {
           function: createSessionLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              account: 'account00',
+            }),
+          },
+        },
+      });
+
+      new Cron(this, "create-account01-session-6h-trigger", {
+        schedule: "rate(6 hours)",
+        job: {
+          function: createSessionLambda,
+          jobProps: {
+            event: RuleTargetInput.fromObject({
+              account: 'account01',
+            }),
+          },
         },
       });
     }
