@@ -76,38 +76,38 @@ export default class WorldsServiceStack extends Stack {
     }]);
 
     // WORLD PREVIEWS QUEUE
-    const saveWorldPreviewDLQ = new Queue(this, "worlds-service-save-world-preview-dlq", {
-      sqsQueue: {
-        retentionPeriod: Duration.seconds(1209600),
-      },
-    });
+    //const saveWorldPreviewDLQ = new Queue(this, "worlds-service-save-world-preview-dlq", {
+      //sqsQueue: {
+        //retentionPeriod: Duration.seconds(1209600),
+      //},
+    //});
 
-    const saveWorldPreviewQueue = new Queue(this, "worlds-service-save-world-preview-queue", {
-      sqsQueue: {
-        visibilityTimeout: Duration.seconds(30 * 3),
-        deadLetterQueue: {
-          maxReceiveCount: 3,
-          queue: saveWorldPreviewDLQ.sqsQueue
-        },
-      },
-    });
+    //const saveWorldPreviewQueue = new Queue(this, "worlds-service-save-world-preview-queue", {
+      //sqsQueue: {
+        //visibilityTimeout: Duration.seconds(30 * 3),
+        //deadLetterQueue: {
+          //maxReceiveCount: 3,
+          //queue: saveWorldPreviewDLQ.sqsQueue
+        //},
+      //},
+    //});
 
-    worldTopic.addSubscribers(this, [{
-      queue: saveWorldPreviewQueue,
-      subscriberProps: {
-        filterPolicy: {
-          type: SubscriptionFilter.stringFilter({ whitelist: ["world-version"] }),
-          previewHasChanged: SubscriptionFilter.stringFilter({ whitelist: ["true"] }),
-        },
-      },
-    }]);
+    //worldTopic.addSubscribers(this, [{
+      //queue: saveWorldPreviewQueue,
+      //subscriberProps: {
+        //filterPolicy: {
+          //type: SubscriptionFilter.stringFilter({ whitelist: ["world-version"] }),
+          //previewHasChanged: SubscriptionFilter.stringFilter({ whitelist: ["true"] }),
+        //},
+      //},
+    //}]);
 
     // S3
-    const worldImagesBucket = new Bucket(this, "worlds-service-world-images", {
-      s3Bucket: {
-        accessControl: BucketAccessControl.PUBLIC_READ,
-      },
-    });
+    //const worldImagesBucket = new Bucket(this, "worlds-service-world-images", {
+      //s3Bucket: {
+        //accessControl: BucketAccessControl.PUBLIC_READ,
+      //},
+    //});
 
     // DYNAMO
     const worldsTable = new Table(this, "worlds-service-worlds", {
@@ -191,23 +191,23 @@ export default class WorldsServiceStack extends Stack {
       });
 
       // Save world images and thumbnails
-      const saveWorldPreviewImageLambda = new Function(this, "worlds-service-save-world-preview-image-lambda", {
-        functionName: this.node.root.logicalPrefixedName("worlds-service-save-world-preview-image"),
-        handler: "src/worlds-service/save-world-preview-image.handler",
-        permissions: [worldImagesBucket],
-        environment: {
-          WORLD_IMAGES_BUCKET: worldImagesBucket.bucketName,
-        },
-        reservedConcurrentExecutions: 1,
-      });
+      //const saveWorldPreviewImageLambda = new Function(this, "worlds-service-save-world-preview-image-lambda", {
+        //functionName: this.node.root.logicalPrefixedName("worlds-service-save-world-preview-image"),
+        //handler: "src/worlds-service/save-world-preview-image.handler",
+        //permissions: [worldImagesBucket],
+        //environment: {
+          //WORLD_IMAGES_BUCKET: worldImagesBucket.bucketName,
+        //},
+        //reservedConcurrentExecutions: 1,
+      //});
 
-      saveWorldPreviewQueue.addConsumer(this, {
-        function: saveWorldPreviewImageLambda,
-        consumerProps: {
-          enabled: true,
-          batchSize: 1,
-        },
-      });
+      //saveWorldPreviewQueue.addConsumer(this, {
+        //function: saveWorldPreviewImageLambda,
+        //consumerProps: {
+          //enabled: true,
+          //batchSize: 1,
+        //},
+      //});
     }
 
     // Periodically trigger inspection of worlds

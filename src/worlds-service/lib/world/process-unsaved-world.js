@@ -1,5 +1,5 @@
 import { table, Author, Tag, World, WorldHistory } from '../connections/dynamodb/Worlds';
-import { publishWorldVersion } from '../publish/publish-world-version';
+//import { publishWorldVersion } from '../publish/publish-world-version';
 import { publishWorldStatistics } from '../publish/publish-world-statistics';
 import { WorldCommonFields } from '../serializers/WorldCommonFields';
 
@@ -55,6 +55,6 @@ export async function processUnsavedWorld(world) {
     throw error;
   }
 
-  await publishWorldVersion(world, true);
-  await publishWorldStatistics(world);
+  //await publishWorldVersion(world, true);
+  return publishWorldStatistics(world);
 }
