@@ -3,6 +3,7 @@ import { table, Author, Tag, World, WorldHistory } from '../connections/dynamodb
 import { publishWorldVersion } from '../publish/publish-world-version';
 import { publishWorldStatistics } from '../publish/publish-world-statistics';
 import { WorldCommonFields } from '../serializers/WorldCommonFields';
+import { detectPlatforms } from '../world/detect-platforms';
 
 export async function processSavedWorld(world, savedWorld) {
   const versionHasChanged = !isEqual(world.version, savedWorld.version);
@@ -34,6 +35,8 @@ export async function processSavedWorld(world, savedWorld) {
         ...(world.heat !== savedWorld.heat && { heat: world.heat }),
         ...(world.popularity !== savedWorld.popularity && { popularity: world.popularity }),
         ...(world.capacity !== savedWorld.capacity && { capacity: world.capacity }),
+
+        platforms: detectPlatforms(world),
 
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
@@ -68,6 +71,8 @@ export async function processSavedWorld(world, savedWorld) {
         ...(world.favorites !== savedWorld.favorites && { favorites: world.favorites }),
         ...(world.heat !== savedWorld.heat && { heat: world.heat }),
         ...(xor(world.tags, savedWorld.tags).length > 0 && { tags: world.tags }),
+
+        platforms: detectPlatforms(world),
 
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
