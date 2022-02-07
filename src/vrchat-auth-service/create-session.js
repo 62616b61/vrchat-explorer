@@ -39,22 +39,30 @@ function getTTL() {
   return seconds;
 }
 
-export async function handler(event = {}) {
-  const { account = "account00" } = event;
-  const { username, password } = await getSecretCredentials(account);
+async function authenticateWithVRChat(username, password) {
+  try {
+    const configuration = new vrchat.Configuration({ username, password });
 
-  const configuration = new vrchat.Configuration({ username, password });
+    const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
+    const response = await AuthenticationApi.getCurrentUser();
 
-  const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
-  const response = await AuthenticationApi.getCurrentUser();
+    const cookieString = await response.config.jar.getCookieString(VRCHAT_API_URL);
+    const cookies = cookieString.split(';').map(x => x.trim())
 
-  const cookieString = await response.config.jar.getCookieString(VRCHAT_API_URL);
-  const cookies = cookieString.split(';').map(x => x.trim())
+    const auth = cookies.find(x => x.startsWith('auth=')).substring(5);
+    const apiKey = cookies.find(x => x.startsWith('apiKey=')).substring(7);
+    const bearer = response.request._header.split('\r\n').find(x => x.startsWith('Authorization')).substring(15);
 
-  const auth = cookies.find(x => x.startsWith('auth=')).substring(5);
-  const apiKey = cookies.find(x => x.startsWith('apiKey=')).substring(7);
-  const bearer = response.request._header.split('\r\n').find(x => x.startsWith('Authorization')).substring(15);
+    return { auth, apiKey, bearer };
+  } catch (error) {
+    // Important!
+    // Do not log out the error since it might contain username and password.
 
+    throw new Error("Failed to authenticate with vrchat: " + error.message);
+  }
+}
+
+async function saveSession(account, auth, apiKey, bearer) {
   // TODO: clear local cookie jar after saving the session
   // to prevent errors when executing this function again before new coldstart
   try {
@@ -71,6 +79,15 @@ export async function handler(event = {}) {
     console.log("error context", error.context);
     throw error;
   }
+}
+
+export async function handler(event = {}) {
+  const { account = "account00" } = event;
+  const { username, password } = await getSecretCredentials(account);
+
+  const { auth, apiKey, bearer } = await authenticateWithVRChat(username, password);
+
+  await saveSession(account, auth, apiKey, bearer);
 
   return { statusCode: 200 };
 }
