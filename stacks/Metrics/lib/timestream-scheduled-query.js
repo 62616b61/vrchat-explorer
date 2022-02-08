@@ -29,15 +29,15 @@ export default function timestreamScheduledQuery(scope, {
 
   const queryString = `
     SELECT
-       bin(time, ${rollupPeriod}) as binned_time,
-       id,
-       authorId,
-       ROUND(AVG(measure_value::bigint)) AS avg,
-       MAX(measure_value::bigint) AS max,
-       MIN(measure_value::bigint) AS min
-     FROM "${databaseName}"."${sourceTableName}"
-     WHERE measure_name = '${rollupTarget}' AND time >= ago(${rollupAgo})
-     GROUP BY id, authorId, bin(time, ${rollupPeriod})
+      bin(time, ${rollupPeriod}) as binned_time,
+      id,
+      authorId,
+      ROUND(AVG(measure_value::bigint)) AS avg,
+      MAX(measure_value::bigint) AS max,
+      MIN(measure_value::bigint) AS min
+    FROM "${databaseName}"."${sourceTableName}"
+    WHERE measure_name = '${rollupTarget}' AND time >= bin(ago(${rollupAgo}), ${rollupPeriod})
+    GROUP BY id, authorId, bin(time, ${rollupPeriod})
    `;
 
   const scheduleConfiguration = { scheduleExpression };
