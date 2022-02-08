@@ -29,7 +29,6 @@ export async function handler(event) {
 
   // TODO: check incoming parameters
 
-  console.log(account, id, reason)
   await suspendSession(account, id, reason);
 
   return { statusCode: 200 };
