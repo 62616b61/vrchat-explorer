@@ -1,8 +1,7 @@
-import * as vrchat from 'vrchat';
-import axios from 'axios';
-import { aws4Interceptor } from "aws4-axios";
+import * as vrchat from "vrchat";
+import axios from "axios";
+import { getSession, suspendSession } from "../lib/connections/api/vrchat-auth-api";
 
-const { VRCHAT_AUTH_API_URL } = process.env;
 const VRCHAT_API_URL = "https://api.vrchat.cloud";
 const AuthenticationApi = new vrchat.AuthenticationApi();
 
@@ -15,15 +14,7 @@ async function retrieveSession() {
   let session;
 
   try {
-    const client = axios.create();
-    const interceptor = aws4Interceptor({
-      region: "us-east-1",
-      service: "execute-api",
-    });
-
-    client.interceptors.request.use(interceptor);
-
-    const response = await client.get(`${VRCHAT_AUTH_API_URL}/session`);
+    const response = await getSession();
 
     session = response.data;
   } catch (error) {
@@ -35,7 +26,7 @@ async function retrieveSession() {
     throw new Error('Received empty session from vrchat-auth-service.');
   }
 
-  console.log(`RETRIEVED VRCHAT SESSION (account, SK): (${session.account}, ${session.SK})`);
+  console.log(`RETRIEVED VRCHAT SESSION (account, SK): (${session.account}, ${session.id})`);
 
   return session;
 }
@@ -63,17 +54,14 @@ async function authenticateWithVRChat(session) {
 
     if (status_code === 401) {
       console.log("ERROR", error.response.data);
-      throw error;
-      // TODO: send session delete request
+      await suspendSession({ account: session.account, id: session.id, reason: error.message });
+      throw new Error(`Error: ${message}`);
     }
+
   }
 }
 
 export async function initializeVRChatSession () {
-  if (!VRCHAT_AUTH_API_URL) {
-    throw new Error('You forgot to provide VRCHAT_AUTH_API_URL env var to this lambda!');
-  }
-
   if (await sessionInitialized()) return;
 
   const session = await retrieveSession();

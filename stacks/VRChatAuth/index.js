@@ -66,11 +66,21 @@ export default class VRChatAuthServiceStack extends Stack {
       },
     });
 
+    const suspendSessionLambda = new Function(this, "vrchat-auth-service-suspend-session-lambda", {
+      functionName: this.node.root.logicalPrefixedName("vrchat-auth-service-suspend-session"),
+      handler: "src/vrchat-auth-service/suspend-session.handler",
+      permissions: [credentialsTable],
+      environment: {
+        CREDENTIALS_TABLE: credentialsTable.tableName,
+      },
+    });
+
     const vrchatAuthApi = new Api(this, "vrchat-auth-service-api", {
       ...(!IS_LOCAL && { defaultAuthorizationType: ApiAuthorizationType.AWS_IAM }),
       accessLog: false,
       routes: {
-        "GET /session": getSessionLambda,
+        "GET  /session": getSessionLambda,
+        "POST /session/{account}/{id}/suspend": suspendSessionLambda,
       },
     });
 

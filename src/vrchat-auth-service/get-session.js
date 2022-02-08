@@ -3,7 +3,7 @@ import { Session } from './lib/connections/dynamodb/Credentials';
 export async function handler() {
   // TODO: rethink and refactor
   // TODO: handle if there's no sessions
-  const sessions = await Session.scan();
+  const sessions = await Session.scan({}, { where: 'attribute_not_exists(suspension)' });
 
   // pick random session
   const session = sessions[Math.floor(Math.random() * sessions.length)];

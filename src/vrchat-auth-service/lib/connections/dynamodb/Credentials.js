@@ -14,13 +14,16 @@ const CredentialsTableSchema = {
 
   models: {
     Session: {
-      PK:       { type: String, value: 'ACCOUNT:${account}' },
-      SK:       { type: String, generate: 'ulid' },
-      TTL:      { type: Number, ttl: true },
-      account:  { type: String, required: true },
-      auth:     { type: String, required: true },
-      apiKey:   { type: String, required: true },
-      bearer:   { type: String, required: true },
+      PK:         { type: String, value: 'ACCOUNT:${account}' },
+      SK:         { type: String, value: '${id}' },
+      id:         { type: String, generate: 'ulid' },
+      account:    { type: String, required: true },
+      auth:       { type: String, required: true },
+      apiKey:     { type: String, required: true },
+      bearer:     { type: String, required: true },
+      suspension: { type: Object },
+
+      TTL:        { type: Number, ttl: true },
     },
   },
 
