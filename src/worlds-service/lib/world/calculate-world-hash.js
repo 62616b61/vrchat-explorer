@@ -17,7 +17,7 @@ export function calculateWorldHash(world) {
     acc[prop] = world[prop];
 
     return acc;
-  }, {})
+  }, {});
 
   return hash(objectToHash);
 }
