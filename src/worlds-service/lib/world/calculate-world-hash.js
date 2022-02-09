@@ -9,7 +9,7 @@ const PROPS_TO_HASH = [
   'releaseStatus',
   'imageUrl',
   'unityPackages',
-  'previewYoutubeId',
+  'publicationDate',
 ];
 
 export function calculateWorldHash(world) {
