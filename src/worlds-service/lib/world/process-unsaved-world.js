@@ -2,11 +2,13 @@ import { table, Author, Tag, World, WorldHistory } from '../connections/dynamodb
 //import { publishWorldVersion } from '../publish/publish-world-version';
 import { publishWorldStatistics } from '../publish/publish-world-statistics';
 import { WorldCommonFields } from '../serializers/WorldCommonFields';
+import { calculateWorldHash } from './calculate-world-hash';
 
 export async function processUnsavedWorld(world) {
   console.log(`World ${world.id} - saving new world`);
 
   const commonFields = WorldCommonFields(world);
+  const worldHash = calculateWorldHash(world);
 
   let batch = {};
 
@@ -27,6 +29,7 @@ export async function processUnsavedWorld(world) {
 
   await WorldHistory.create(
     {
+      hash: worldHash,
       description: world.description,
       releaseStatus: world.releaseStatus,
       popularity: world.popularity,

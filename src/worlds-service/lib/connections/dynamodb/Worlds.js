@@ -58,6 +58,7 @@ const WorldsTableSchema = {
       SK:              { type: String, value: 'HISTORY:${updatedAt}:${version}' },
       SK2:             { type: String, value: 'VERSION:${version}' },
 
+      hash:            { type: String, required: true },
       description:     { type: String, required: true },
       releaseStatus:   { type: String, enum: ['public', 'private', 'hidden'] },
       popularity:      { type: Number, required: true },

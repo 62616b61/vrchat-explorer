@@ -3,7 +3,8 @@ import { table, Author, Tag, World, WorldHistory } from '../connections/dynamodb
 //import { publishWorldVersion } from '../publish/publish-world-version';
 import { publishWorldStatistics } from '../publish/publish-world-statistics';
 import { WorldCommonFields } from '../serializers/WorldCommonFields';
-import { detectPlatforms } from '../world/detect-platforms';
+import { calculateWorldHash } from './calculate-world-hash'
+import { detectPlatforms } from './detect-platforms';
 
 export async function processSavedWorld(world, savedWorld) {
   const versionHasChanged = !isEqual(world.version, savedWorld.version);
@@ -13,6 +14,7 @@ export async function processSavedWorld(world, savedWorld) {
     console.log(`World ${world.id} - version changed from ${savedWorld.version} to ${world.version}`)
 
     const commonFields = WorldCommonFields(world);
+    const worldHash = calculateWorldHash(world);
 
     //let batch = {};
 
@@ -21,7 +23,6 @@ export async function processSavedWorld(world, savedWorld) {
         worldId: world.id,
         updatedAt: world.updated_at,
         version: world.version,
-        unityPackages: world.unityPackages,
         ...(world.authorName !== savedWorld.authorName && { authorName: world.authorName }),
         ...(world.imageUrl !== savedWorld.imageUrl && { imageUrl: world.imageUrl }),
         ...(world.thumbnailImageUrl !== savedWorld.thumbnailImageUrl && { thumbnailImageUrl: world.thumbnailImageUrl }),
@@ -46,11 +47,11 @@ export async function processSavedWorld(world, savedWorld) {
 
     await WorldHistory.create(
       {
+        hash: worldHash,
         description: world.description,
         releaseStatus: world.releaseStatus,
         popularity: world.popularity,
         capacity: world.capacity,
-        unityPackages: world.unityPackages,
         ...commonFields,
       },
       //{ batch },

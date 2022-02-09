@@ -27,6 +27,7 @@
     "aws4-axios": "^2.4.6",
     "dynamodb-onetable": "^2.3.0",
     "lodash": "^4.17.21",
+    "object-hash": "^2.2.0",
     "vrchat": "^1.6.9"
   },
   "devDependencies": {
