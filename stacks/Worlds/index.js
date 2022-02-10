@@ -1,10 +1,9 @@
-import { Bucket, Stack, Cron, Function, Table, TableFieldType, Topic, Queue } from "@serverless-stack/resources";
+import { Stack, Cron, Function, Table, TableFieldType, Topic, Queue } from "@serverless-stack/resources";
 import { RuleTargetInput } from "aws-cdk-lib/aws-events";
 import { RemovalPolicy } from "aws-cdk-lib";
 import { SubscriptionFilter } from "aws-cdk-lib/aws-sns";
 import { StartingPosition } from "aws-cdk-lib/aws-lambda";
-import { StreamViewType } from "aws-cdk-lib/aws-dynamodb";
-import { BucketAccessControl } from "aws-cdk-lib/aws-s3";
+import { ProjectionType, StreamViewType } from "aws-cdk-lib/aws-dynamodb";
 import { Duration } from "aws-cdk-lib";
 
 const { IS_LOCAL } = process.env;
@@ -75,42 +74,8 @@ export default class WorldsServiceStack extends Stack {
       }
     }]);
 
-    // WORLD PREVIEWS QUEUE
-    //const saveWorldPreviewDLQ = new Queue(this, "worlds-service-save-world-preview-dlq", {
-      //sqsQueue: {
-        //retentionPeriod: Duration.seconds(1209600),
-      //},
-    //});
-
-    //const saveWorldPreviewQueue = new Queue(this, "worlds-service-save-world-preview-queue", {
-      //sqsQueue: {
-        //visibilityTimeout: Duration.seconds(30 * 3),
-        //deadLetterQueue: {
-          //maxReceiveCount: 3,
-          //queue: saveWorldPreviewDLQ.sqsQueue
-        //},
-      //},
-    //});
-
-    //worldTopic.addSubscribers(this, [{
-      //queue: saveWorldPreviewQueue,
-      //subscriberProps: {
-        //filterPolicy: {
-          //type: SubscriptionFilter.stringFilter({ whitelist: ["world-version"] }),
-          //previewHasChanged: SubscriptionFilter.stringFilter({ whitelist: ["true"] }),
-        //},
-      //},
-    //}]);
-
-    // S3
-    //const worldImagesBucket = new Bucket(this, "worlds-service-world-images", {
-      //s3Bucket: {
-        //accessControl: BucketAccessControl.PUBLIC_READ,
-      //},
-    //});
-
     // DYNAMO
-    const worldsTable = new Table(this, "worlds-service-worlds", {
+    const worldsTable = new Table(this, "worlds-service-worlds-v6", {
       fields: {
         PK: TableFieldType.STRING,
         SK: TableFieldType.STRING,
@@ -119,10 +84,13 @@ export default class WorldsServiceStack extends Stack {
       },
       primaryIndex: { partitionKey: "PK", sortKey: "SK" },
       globalIndexes: {
-        GSI1: { partitionKey: "GSI1PK", sortKey: "GSI1SK" },
-      },
-      localIndexes: {
-        LSI1: { sortKey: "SK2" },
+        GSI1: {
+          partitionKey: "GSI1PK",
+          sortKey: "GSI1SK",
+          indexProps: {
+            projectionType: ProjectionType.KEYS_ONLY,
+          },
+        },
       },
       // Enable DynamoDB stream
       //stream: StreamViewType.KEYS_ONLY,
@@ -189,25 +157,6 @@ export default class WorldsServiceStack extends Stack {
           },
         },
       });
-
-      // Save world images and thumbnails
-      //const saveWorldPreviewImageLambda = new Function(this, "worlds-service-save-world-preview-image-lambda", {
-        //functionName: this.node.root.logicalPrefixedName("worlds-service-save-world-preview-image"),
-        //handler: "src/worlds-service/save-world-preview-image.handler",
-        //permissions: [worldImagesBucket],
-        //environment: {
-          //WORLD_IMAGES_BUCKET: worldImagesBucket.bucketName,
-        //},
-        //reservedConcurrentExecutions: 1,
-      //});
-
-      //saveWorldPreviewQueue.addConsumer(this, {
-        //function: saveWorldPreviewImageLambda,
-        //consumerProps: {
-          //enabled: true,
-          //batchSize: 1,
-        //},
-      //});
     }
 
     // Periodically trigger inspection of worlds
