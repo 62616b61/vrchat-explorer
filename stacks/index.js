@@ -2,6 +2,7 @@ import { Tracing } from "aws-cdk-lib/aws-lambda";
 
 import VRChatAuthServiceStack from "./VRChatAuth";
 import DiscoveryServiceStack from "./Discovery";
+import DiscordServiceStack from "./Discord";
 import WorldsServiceStack from "./Worlds";
 import MetricsServiceStack from "./Metrics";
 
@@ -20,5 +21,6 @@ export default function main(app) {
   const { vrchatAuthApi } = new VRChatAuthServiceStack(app, "vrchat-auth-service");
   const { worldTopic } = new WorldsServiceStack(app, "worlds-service", { vrchatAuthApi });
   const discoveryServiceStack = new DiscoveryServiceStack(app, "discovery-service", { vrchatAuthApi, worldTopic });
+  const discordServiceStack = new DiscordServiceStack(app, "discord-service", { worldTopic });
   const metricsServiceStack = new MetricsServiceStack(app, "metrics-service", { worldTopic });
 }
