@@ -75,7 +75,7 @@ export default class WorldsServiceStack extends Stack {
     }]);
 
     // DYNAMO
-    const worldsTable = new Table(this, "worlds-service-worlds-v6", {
+    const worldsTable = new Table(this, "worlds-service-worlds-v2", {
       fields: {
         PK: TableFieldType.STRING,
         SK: TableFieldType.STRING,
