@@ -27,19 +27,19 @@ export async function processSavedWorld(world, savedWorld) {
         publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
         labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
 
-        ...(world.authorName !== savedWorld.authorName && { authorName: world.authorName }),
-        ...(world.imageUrl !== savedWorld.imageUrl && { imageUrl: world.imageUrl }),
-        ...(world.thumbnailImageUrl !== savedWorld.thumbnailImageUrl && { thumbnailImageUrl: world.thumbnailImageUrl }),
+        ...(!isEqual(world.authorName, savedWorld.authorName) && { authorName: world.authorName }),
+        ...(!isEqual(world.imageUrl, savedWorld.imageUrl) && { imageUrl: world.imageUrl }),
+        ...(!isEqual(world.thumbnailImageUrl, savedWorld.thumbnailImageUrl) && { thumbnailImageUrl: world.thumbnailImageUrl }),
 
-        ...(world.name !== savedWorld.name && { name: world.name }),
-        ...(world.favorites !== savedWorld.favorites && { favorites: world.favorites }),
+        ...(!isEqual(world.name, savedWorld.name) && { name: world.name }),
+        ...(!isEqual(world.favorites, savedWorld.favorites) && { favorites: world.favorites }),
         ...(xor(world.tags, savedWorld.tags).length > 0 && { tags: world.tags }),
 
-        ...(world.description !== savedWorld.description && { description: world.description }),
-        ...(world.releaseStatus !== savedWorld.releaseStatus && { releaseStatus: world.releaseStatus }),
-        ...(world.heat !== savedWorld.heat && { heat: world.heat }),
-        ...(world.popularity !== savedWorld.popularity && { popularity: world.popularity }),
-        ...(world.capacity !== savedWorld.capacity && { capacity: world.capacity }),
+        ...(!isEqual(world.description, savedWorld.description) && { description: world.description }),
+        ...(!isEqual(world.releaseStatus, savedWorld.releaseStatus) && { releaseStatus: world.releaseStatus }),
+        ...(!isEqual(world.heat, savedWorld.heat) && { heat: world.heat }),
+        ...(!isEqual(world.popularity, savedWorld.popularity) && { popularity: world.popularity }),
+        ...(!isEqual(world.capacity, savedWorld.capacity) && { capacity: world.capacity }),
       },
     );
 
