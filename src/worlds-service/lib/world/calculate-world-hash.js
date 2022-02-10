@@ -1,5 +1,11 @@
 import hash from 'object-hash';
 
+//const PROPS_TO_HASH = [
+  //'id',
+  //'imageUrl',
+  //'unityPackages',
+//];
+
 const PROPS_TO_HASH = [
   'id',
   'name',
@@ -9,6 +15,7 @@ const PROPS_TO_HASH = [
   'releaseStatus',
   'imageUrl',
   'unityPackages',
+  'previewYoutubeId',
   'publicationDate',
 ];
 

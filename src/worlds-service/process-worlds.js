@@ -3,8 +3,11 @@ import sleep from 'await-sleep';
 import { parse } from '../lib/connections/sqs';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
 import { World } from './lib/connections/dynamodb/Worlds';
+import { ParsedWorld } from './lib/serializers/ParsedWorld';
 import { processSavedWorld } from './lib/world/process-saved-world';
 import { processUnsavedWorld } from './lib/world/process-unsaved-world';
+
+const WorldsApi = new vrchat.WorldsApi();
 
 async function processMessage(message, retry = 0) {
   if (retry > 3) {
@@ -21,18 +24,16 @@ async function processMessage(message, retry = 0) {
 
   console.log(`World ${message.id} - start processing`)
 
-  const savedWorld = message.version
-    ? message
-    : await World.get({ worldId: message.id });
+  const savedWorld = await World.get({ worldId: message.id });
 
-  const WorldsApi = new vrchat.WorldsApi({});
   try {
     const { data: discoveredWorld } = await WorldsApi.getWorld(message.id);
+    const parsedWorld = ParsedWorld(discoveredWorld);
 
     if (savedWorld && savedWorld.status === "enabled") {
-      return processSavedWorld(discoveredWorld, savedWorld);
+      return processSavedWorld(parsedWorld, savedWorld);
     } else {
-      return processUnsavedWorld(discoveredWorld);
+      return processUnsavedWorld(parsedWorld);
     }
   } catch (error) {
     if (error.isAxiosError) {
