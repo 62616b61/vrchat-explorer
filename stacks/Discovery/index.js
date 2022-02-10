@@ -25,15 +25,15 @@ export default class DiscoveryServiceStack extends Stack {
     // LAMBDA SCHEDULED TRIGGERS
     if (!IS_LOCAL) {
       // Discover NEW worlds every hour
-      new Cron(this, "discover-worlds-NEW-1h-trigger", {
-        schedule: "rate(1 hour)",
+      new Cron(this, "discover-worlds-NEW-30m-trigger", {
+        schedule: "rate(30 minutes)",
         job: {
           function: discoverWorldsLambda,
           jobProps: {
             event: RuleTargetInput.fromObject({
               batching: {
-                FETCH_LIMIT: 100,
-                FETCH_BATCH_SIZE: 100,
+                FETCH_LIMIT: 50,
+                FETCH_BATCH_SIZE: 50,
                 PUBLISH_BATCH_SIZE: 25,
               },
               filters: {
@@ -50,15 +50,15 @@ export default class DiscoveryServiceStack extends Stack {
       });
 
       // Discover RECENTLY UPDATED worlds every hour
-      new Cron(this, "discover-worlds-RECENTLY-UPDATED-1h-trigger", {
-        schedule: "rate(1 hour)",
+      new Cron(this, "discover-worlds-RECENTLY-UPDATED-30m-trigger", {
+        schedule: "rate(30 minutes)",
         job: {
           function: discoverWorldsLambda,
           jobProps: {
             event: RuleTargetInput.fromObject({
               batching: {
-                FETCH_LIMIT: 100,
-                FETCH_BATCH_SIZE: 100,
+                FETCH_LIMIT: 50,
+                FETCH_BATCH_SIZE: 50,
                 PUBLISH_BATCH_SIZE: 25,
               },
               filters: {
