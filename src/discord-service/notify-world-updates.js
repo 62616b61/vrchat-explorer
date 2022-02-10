@@ -1,4 +1,5 @@
 import { Client, Intents } from 'discord.js';
+import sleep from 'await-sleep';
 import { parse } from '../lib/connections/sqs';
 
 const { DISCORD_BOT_TOKEN } = process.env;
@@ -18,17 +19,9 @@ client.on('ready', () => {
 client.login(DISCORD_BOT_TOKEN);
 
 async function waitUntilClientReady() {
-  if (client.isReady()) return;
-
-  let interval;
-  return new Promise((resolve) => {
-    interval = setInterval(() => {
-      if (client.isReady()) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 50);
-  });
+  while(!client.isReady()) {
+    await sleep(50);
+  }
 }
 
 export async function handler(event) {
