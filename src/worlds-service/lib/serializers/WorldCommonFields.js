@@ -1,7 +1,6 @@
-import { detectPlatforms } from '../world/detect-platforms';
-
-export function WorldCommonFields(world) {
+export function WorldCommonFields(world, worldHash) {
   const commonFields = {
+    hash: worldHash,
     worldId: world.id,
     authorId: world.authorId,
     authorName: world.authorName,
@@ -11,15 +10,19 @@ export function WorldCommonFields(world) {
     favorites: world.favorites,
     heat: world.heat,
     tags: world.tags,
+    unityPackages: world.unityPackages,
     name: world.name,
+
+    description: world.description,
+    releaseStatus: world.releaseStatus,
+    popularity: world.popularity,
+    capacity: world.capacity,
 
     version: world.version,
     createdAt: world.created_at,
     updatedAt: world.updated_at,
     publicationDate: world.publicationDate !== "none" ? world.publicationDate : null,
     labsPublicationDate: world.labsPublicationDate !== "none" ? world.labsPublicationDate : null,
-
-    platforms: detectPlatforms(world),
   };
 
   return commonFields;
