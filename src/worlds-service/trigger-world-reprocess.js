@@ -1,6 +1,6 @@
 import { chunk } from 'lodash';
 import { World } from './lib/connections/dynamodb/Worlds';
-import { serialize } from '../lib/serializers/World/WorldReprocess';
+import { serialize } from './lib/serializers/WorldReprocess';
 import { publish } from '../lib/connections/sns';
 
 const { PUBLISH_BATCH_SIZE, WORLD_TOPIC, IS_LOCAL } = process.env;
@@ -28,6 +28,7 @@ function getSNSAttributes(parameters) {
 
 async function loadWorlds({ parameters, next } = DEFAULT_ARGUMENTS) {
   const worlds = await World.find(parameters, {
+    hidden: true,
     index: 'GSI1',
     limit: 100,
     next,
