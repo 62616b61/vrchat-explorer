@@ -1,4 +1,4 @@
-export function serialize(world) {
+export function serialize(world, worldDelta) {
   return {
     id: world.id,
     name: world.name,
@@ -7,15 +7,11 @@ export function serialize(world) {
     version: world.version,
     capacity: world.capacity,
     imageUrl: world.imageUrl,
-    thumbnailImageUrl: world.thumbnailImageUrl,
     releaseStatus: world.releaseStatus,
     tags: world.tags,
-    favorites: world.favorites,
-    created_at: world.created_at,
     updated_at: world.updated_at,
     publicationDate: world.publicationDate,
-    labsPublicationDate: world.labsPublicationDate,
-    popularity: world.popularity,
-    heat: world.heat,
+
+    delta: worldDelta,
   };
 }

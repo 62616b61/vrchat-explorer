@@ -1,6 +1,6 @@
 import { xor, isEqual } from 'lodash';
 import { World, WorldHistory } from '../connections/dynamodb/Worlds';
-//import { publishWorldVersion } from '../publish/publish-world-version';
+import { publishWorldUpdate } from '../publish/publish-world-update';
 import { publishWorldStatistics } from '../publish/publish-world-statistics';
 import { WorldCommonFields } from '../serializers/WorldCommonFields';
 import { calculateWorldHash } from './calculate-world-hash';
@@ -9,7 +9,6 @@ import { calculateWorldDelta } from './calculate-world-delta';
 export async function processSavedWorld(world, savedWorld) {
   const worldHash = calculateWorldHash(world);
   const hashHasChanged = !isEqual(worldHash, savedWorld.hash);
-  //const previewHasChanged = !isEqual(world.imageUrl, savedWorld.imageUrl);
 
   if (hashHasChanged) {
     console.log(`World ${world.id} - version changed from ${savedWorld.version} to ${world.version}`)
@@ -56,10 +55,7 @@ export async function processSavedWorld(world, savedWorld) {
       },
     );
 
-    //await publishWorldVersion(world, previewHasChanged);
-  } else {
-    //console.log(`World ${world.id} - version unchanged`);
-    // TODO: compare tags and other stuff that can change without version changing
+    await publishWorldUpdate(world, worldDelta);
   }
 
   return publishWorldStatistics(world);
