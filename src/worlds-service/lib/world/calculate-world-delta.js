@@ -19,10 +19,7 @@ function findDifference(world, savedWorld, property) {
   const propertyChanged = !isEqual(current, previous);
 
   if (propertyChanged) {
-    return {
-      property,
-      previous,
-    };
+    return property;
   }
 
   return null;
