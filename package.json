@@ -25,6 +25,7 @@
     "@serverless-stack/resources": "^0.60.11",
     "await-sleep": "^0.0.1",
     "aws4-axios": "^2.4.6",
+    "discord.js": "^13.6.0",
     "dynamodb-onetable": "^2.3.0",
     "lodash": "^4.17.21",
     "object-hash": "^2.2.0",
