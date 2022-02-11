@@ -11,10 +11,10 @@ export async function processSavedWorld(world, savedWorld) {
   const hashHasChanged = !isEqual(worldHash, savedWorld.hash);
 
   if (hashHasChanged) {
-    console.log(`World ${world.id} - version changed from ${savedWorld.version} to ${world.version}`)
-
     const worldDelta = calculateWorldDelta(world, savedWorld);
     const commonFields = WorldCommonFields(world, worldHash);
+
+    console.log(`World ${world.id} - hash changed (delta: ${worldDelta})`);
 
     await World.update(
       {
