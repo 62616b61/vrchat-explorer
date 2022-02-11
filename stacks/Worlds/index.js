@@ -27,6 +27,7 @@ export default class WorldsServiceStack extends Stack {
 
     const discoveredWorldsQueue = new Queue(this, "worlds-service-discovered-worlds-queue", {
       sqsQueue: {
+        receiveMessageWaitTime: Duration.seconds(20),
         visibilityTimeout: Duration.seconds(30 * 3),
         deadLetterQueue: {
           maxReceiveCount: 3,
@@ -55,6 +56,7 @@ export default class WorldsServiceStack extends Stack {
 
     const reprocessWorldsQueue = new Queue(this, "worlds-service-reprocess-worlds-queue", {
       sqsQueue: {
+        receiveMessageWaitTime: Duration.seconds(20),
         visibilityTimeout: Duration.seconds(30 * 3),
         deadLetterQueue: {
           maxReceiveCount: 3,
