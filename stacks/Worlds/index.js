@@ -28,7 +28,7 @@ export default class WorldsServiceStack extends Stack {
     const discoveredWorldsQueue = new Queue(this, "worlds-service-discovered-worlds-queue", {
       sqsQueue: {
         receiveMessageWaitTime: Duration.seconds(20),
-        visibilityTimeout: Duration.seconds(30 * 3),
+        visibilityTimeout: Duration.seconds(300 * 6),
         deadLetterQueue: {
           maxReceiveCount: 3,
           queue: discoveredWorldsDLQ.sqsQueue
@@ -57,7 +57,7 @@ export default class WorldsServiceStack extends Stack {
     const reprocessWorldsQueue = new Queue(this, "worlds-service-reprocess-worlds-queue", {
       sqsQueue: {
         receiveMessageWaitTime: Duration.seconds(20),
-        visibilityTimeout: Duration.seconds(30 * 3),
+        visibilityTimeout: Duration.seconds(300 * 6),
         deadLetterQueue: {
           maxReceiveCount: 3,
           queue: reprocessWorldsDLQ.sqsQueue
@@ -114,7 +114,7 @@ export default class WorldsServiceStack extends Stack {
         WORLDS_TABLE: worldsTable.tableName,
         WORLD_TOPIC: worldTopic.topicArn,
       },
-      timeout: 60,
+      timeout: 300,
       reservedConcurrentExecutions: 1,
     });
 
