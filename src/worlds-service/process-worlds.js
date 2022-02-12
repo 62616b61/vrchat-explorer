@@ -36,7 +36,7 @@ async function processMessage(message, retry = 0) {
       return processUnsavedWorld(parsedWorld);
     }
   } catch (error) {
-    if (error.isAxiosError) {
+    if (error.isAxiosError && error.response) {
       if (error.response.status === 404) {
         // TODO: send removal request
         console.log("World not found!");
@@ -57,8 +57,9 @@ async function processMessage(message, retry = 0) {
     }
 
     if (error.isAxiosError) {
-      console.log("RESEPONSE: ", error.response);
-      console.log("RESPONSE DATA: ", error.response.data);
+      console.log("ERROR: ", error);
+      console.log("RESEPONSE: ", error?.response);
+      console.log("RESPONSE DATA: ", error?.response?.data);
     } else {
       console.log("ERROR GENERIC: ", error);
     }
