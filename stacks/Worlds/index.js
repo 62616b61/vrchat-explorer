@@ -17,6 +17,12 @@ export default class WorldsServiceStack extends Stack {
     // SNS
     const worldTopic = new Topic(this, "worlds-service-world-topic");
 
+    const worldsTopic = new Topic(this, "worlds-service-worlds-topic", {
+      snsTopic: {
+        topicName: scope.node.root.logicalPrefixedName("worlds-service-worlds"),
+      },
+    });
+
     // SQS
     // DISCOVERED WORLDS QUEUE
     const discoveredWorldsDLQ = new Queue(this, "worlds-service-discovered-worlds-queue-dlq", {
@@ -36,7 +42,7 @@ export default class WorldsServiceStack extends Stack {
       },
     });
 
-    worldTopic.addSubscribers(this, [{
+    worldsTopic.addSubscribers(this, [{
       queue: discoveredWorldsQueue,
       subscriberProps: {
         filterPolicy: {
@@ -65,7 +71,7 @@ export default class WorldsServiceStack extends Stack {
       },
     });
 
-    worldTopic.addSubscribers(this, [{
+    worldsTopic.addSubscribers(this, [{
       queue: reprocessWorldsQueue,
       subscriberProps: {
         filterPolicy: {
@@ -108,11 +114,11 @@ export default class WorldsServiceStack extends Stack {
     const processWorldsLambda = new Function(this, "worlds-service-process-lambda", {
       functionName: this.node.root.logicalPrefixedName("worlds-service-process-worlds"),
       handler: "src/worlds-service/process-worlds.handler",
-      permissions: [vrchatAuthApi, worldsTable, worldTopic],
+      permissions: [vrchatAuthApi, worldsTable, worldsTopic],
       environment: {
         VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
         WORLDS_TABLE: worldsTable.tableName,
-        WORLD_TOPIC: worldTopic.topicArn,
+        WORLDS_TOPIC: worldsTopic.topicArn,
       },
       timeout: 300,
       reservedConcurrentExecutions: 1,
@@ -165,11 +171,11 @@ export default class WorldsServiceStack extends Stack {
     const triggerWorldReprocessLambda = new Function(this, "worlds-service-trigger-world-reprocess-lambda", {
       functionName: this.node.root.logicalPrefixedName("worlds-service-trigger-world-reprocess"),
       handler: "src/worlds-service/trigger-world-reprocess.handler",
-      permissions: [worldsTable, worldTopic],
+      permissions: [worldsTable, worldsTopic],
       environment: {
         PUBLISH_BATCH_SIZE: "25",
         WORLDS_TABLE: worldsTable.tableName,
-        WORLD_TOPIC: worldTopic.topicArn,
+        WORLDS_TOPIC: worldsTopic.topicArn,
       },
       timeout: 600,
     });
@@ -237,5 +243,6 @@ export default class WorldsServiceStack extends Stack {
     }
     
     this.worldTopic = worldTopic;
+    this.worldsTopic = worldsTopic;
   }
 }

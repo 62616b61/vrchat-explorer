@@ -1,4 +1,4 @@
-const { WORLD_TOPIC } = process.env;
+const { WORLDS_TOPIC } = process.env;
 
 import { serialize } from '../../../lib/serializers/World/WorldUpdate';
 import { publish } from '../../../lib/connections/sns';
@@ -20,5 +20,5 @@ export function publishWorldUpdate(world, worldDelta) {
   const attributes = getSNSAttributes(worldDelta);
   const message = serialize(world, worldDelta);
 
-  return publish(WORLD_TOPIC, message, attributes);
+  return publish(WORLDS_TOPIC, message, attributes);
 }
