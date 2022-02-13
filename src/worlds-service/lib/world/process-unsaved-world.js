@@ -8,6 +8,7 @@ export async function processUnsavedWorld(world) {
 
   const worldHash = calculateWorldHash(world);
   const commonFields = WorldCommonFields(world, worldHash);
+  const discoveredAt = new Date().toISOString();
 
   let batch = {};
 
@@ -15,13 +16,17 @@ export async function processUnsavedWorld(world) {
     {
       // TODO: determine optimal update schedule from available data
       schedule: '24h',
+      discoveredAt,
       ...commonFields,
     },
     { batch },
   );
 
   await WorldHistory.create(
-    { ...commonFields },
+    {
+      discoveredAt,
+      ...commonFields
+    },
     { batch },
   );
 

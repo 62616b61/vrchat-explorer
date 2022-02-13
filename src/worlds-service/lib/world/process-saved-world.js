@@ -13,6 +13,7 @@ export async function processSavedWorld(world, savedWorld) {
   if (hashHasChanged) {
     const worldDelta = calculateWorldDelta(world, savedWorld);
     const commonFields = WorldCommonFields(world, worldHash);
+    const discoveredAt = new Date().toISOString();
 
     console.log(`World ${world.id} - hash changed (delta: ${worldDelta})`);
 
@@ -45,6 +46,7 @@ export async function processSavedWorld(world, savedWorld) {
 
     await WorldHistory.create(
       {
+        discoveredAt,
         delta: worldDelta,
         description: world.description,
         releaseStatus: world.releaseStatus,

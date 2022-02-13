@@ -25,6 +25,7 @@ const commonFields = {
   capacity:            { type: Number, required: true },
 
   version:             { type: Number, required: true },
+  discoveredAt:        { type: String, required: true },
   createdAt:           { type: String, required: true },
   updatedAt:           { type: String, required: true },
   publicationDate:     { type: String },
