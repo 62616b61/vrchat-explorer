@@ -8,7 +8,7 @@ export default class DiscordServiceStack extends Stack {
   constructor(scope, service, props) {
     super(scope, service, props);
 
-    const { worldTopic } = props;
+    const { worldsTopic } = props;
 
     // SQS
     // WORLD UPDATES QUEUE
@@ -28,7 +28,7 @@ export default class DiscordServiceStack extends Stack {
       },
     });
 
-    worldTopic.addSubscribers(this, [{
+    worldsTopic.addSubscribers(this, [{
       queue: worldUpdatesQueue,
       subscriberProps: {
         filterPolicy: {

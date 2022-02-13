@@ -3,7 +3,7 @@ import { SubscriptionFilter } from "aws-cdk-lib/aws-sns";
 import { Duration } from "aws-cdk-lib";
 
 export default function sqs(scope, {
-  worldTopic,
+  worldsTopic,
 }) {
   const worldStatisticsDLQ = new Queue(scope, "metrics-service-world-statistics-queue-dlq", {
     sqsQueue: {
@@ -21,7 +21,7 @@ export default function sqs(scope, {
     },
   });
 
-  worldTopic.addSubscribers(scope, [{
+  worldsTopic.addSubscribers(scope, [{
     queue: worldStatisticsQueue,
     subscriberProps: {
       filterPolicy: {

@@ -4,7 +4,7 @@ import { serialize } from '../lib/serializers/World/DiscoveredWorld';
 import { publish } from '../lib/connections/sns';
 import { chunk } from 'lodash';
 
-const { WORLD_TOPIC, IS_LOCAL } = process.env;
+const { WORLDS_TOPIC, IS_LOCAL } = process.env;
 
 const PARAMETER_OFFSET_HARD_LIMIT = 999;
 const PARAMETER_NUMBER_HARD_LIMIT = 100;
@@ -102,7 +102,7 @@ async function loadVRChatWorlds({ parameters, number = DEFAULT_ARGUMENTS.batchin
 
     const parts = chunk(message, parameters?.batching?.PUBLISH_BATCH_SIZE || DEFAULT_ARGUMENTS.batching.PUBLISH_BATCH_SIZE);
     await Promise.all(
-      parts.map(part => publish(WORLD_TOPIC, part, attributes))
+      parts.map(part => publish(WORLDS_TOPIC, part, attributes))
     );
   }
 

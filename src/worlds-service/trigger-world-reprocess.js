@@ -3,7 +3,7 @@ import { World } from './lib/connections/dynamodb/Worlds';
 import { serialize } from './lib/serializers/WorldReprocess';
 import { publish } from '../lib/connections/sns';
 
-const { PUBLISH_BATCH_SIZE, WORLD_TOPIC, IS_LOCAL } = process.env;
+const { PUBLISH_BATCH_SIZE, WORLDS_TOPIC, IS_LOCAL } = process.env;
 
 const DEFAULT_ARGUMENTS = {
   parameters: {
@@ -42,7 +42,7 @@ async function loadWorlds({ parameters, next } = DEFAULT_ARGUMENTS) {
 
     const parts = chunk(message, String(PUBLISH_BATCH_SIZE));
     await Promise.all(
-      parts.map(part => publish(WORLD_TOPIC, part, attributes))
+      parts.map(part => publish(WORLDS_TOPIC, part, attributes))
     );
   }
 

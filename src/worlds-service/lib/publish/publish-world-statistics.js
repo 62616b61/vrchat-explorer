@@ -1,4 +1,4 @@
-const { WORLD_TOPIC } = process.env;
+const { WORLDS_TOPIC } = process.env;
 
 import { serialize } from '../../../lib/serializers/World/WorldStats';
 import { publish } from '../../../lib/connections/sns';
@@ -21,5 +21,5 @@ export function publishWorldStatistics(world) {
   const attributes = getSNSAttributes(timestamp);
   const message = serialize({ ...world, timestamp });
 
-  return publish(WORLD_TOPIC, message, attributes);
+  return publish(WORLDS_TOPIC, message, attributes);
 }

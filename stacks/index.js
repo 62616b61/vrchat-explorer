@@ -19,8 +19,8 @@ export default function main(app) {
   });
 
   const { vrchatAuthApi } = new VRChatAuthServiceStack(app, "vrchat-auth-service");
-  const { worldTopic } = new WorldsServiceStack(app, "worlds-service", { vrchatAuthApi });
-  const discoveryServiceStack = new DiscoveryServiceStack(app, "discovery-service", { vrchatAuthApi, worldTopic });
-  const discordServiceStack = new DiscordServiceStack(app, "discord-service", { worldTopic });
-  const metricsServiceStack = new MetricsServiceStack(app, "metrics-service", { worldTopic });
+  const { worldsTopic } = new WorldsServiceStack(app, "worlds-service", { vrchatAuthApi });
+  const discoveryServiceStack = new DiscoveryServiceStack(app, "discovery-service", { vrchatAuthApi, worldsTopic });
+  const discordServiceStack = new DiscordServiceStack(app, "discord-service", { worldsTopic });
+  const metricsServiceStack = new MetricsServiceStack(app, "metrics-service", { worldsTopic });
 }

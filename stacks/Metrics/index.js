@@ -14,7 +14,7 @@ export default class MetricsServiceStack extends Stack {
   constructor(scope, service, props) {
     super(scope, service, props);
 
-    const { worldTopic } = props;
+    const { worldsTopic } = props;
 
     // S3
     const { timestreamScheduledQueryErrorReportingBucket } = s3(this);
@@ -23,7 +23,7 @@ export default class MetricsServiceStack extends Stack {
     const { timestreamScheduledQueryResultsTopic } = sns(this);
 
     //SQS
-    const { worldStatisticsQueue } = sqs(this, { worldTopic });
+    const { worldStatisticsQueue } = sqs(this, { worldsTopic });
 
     // TIMESTREAM
     const {

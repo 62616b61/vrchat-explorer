@@ -7,17 +7,17 @@ export default class DiscoveryServiceStack extends Stack {
   constructor(scope, service, props) {
     super(scope, service, props);
 
-    const { vrchatAuthApi, worldTopic } = props;
+    const { vrchatAuthApi, worldsTopic } = props;
 
     // LAMBDAS
     // Discover worlds
     const discoverWorldsLambda = new Function(this, "discovery-service-discover-worlds-lambda", {
       functionName: this.node.root.logicalPrefixedName("discovery-service-discover-worlds"),
       handler: "src/discovery-service/discover-worlds.handler",
-      permissions: [vrchatAuthApi, worldTopic],
+      permissions: [vrchatAuthApi, worldsTopic],
       environment: {
         VRCHAT_AUTH_API_URL: vrchatAuthApi.url,
-        WORLD_TOPIC: worldTopic.topicArn,
+        WORLDS_TOPIC: worldsTopic.topicArn,
       },
       timeout: 30,
     });
