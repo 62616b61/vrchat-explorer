@@ -19,7 +19,7 @@ export default class WorldsServiceStack extends Stack {
 
     const worldsTopic = new Topic(this, "worlds-service-worlds-topic", {
       snsTopic: {
-        topicName: "worlds-service-worlds",
+        topicName: scope.node.root.logicalPrefixedName("worlds-service-worlds"),
       },
     });
 

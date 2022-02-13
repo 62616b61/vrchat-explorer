@@ -8,7 +8,6 @@ export default function lambda(scope, {
   metricsTableRaw,
   worldStatisticsQueue,
 }) {
-
   const saveWorldStatisticsLambda = new Function(scope, "metrics-service-save-world-statistics-lambda", {
     functionName: scope.node.root.logicalPrefixedName("metrics-service-save-world-statistics"),
     handler: "src/metrics-service/save-world-statistics.handler",
