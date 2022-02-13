@@ -15,8 +15,6 @@ export default class WorldsServiceStack extends Stack {
     const { vrchatAuthApi } = props;
 
     // SNS
-    const worldTopic = new Topic(this, "worlds-service-world-topic");
-
     const worldsTopic = new Topic(this, "worlds-service-worlds-topic", {
       snsTopic: {
         topicName: scope.node.root.logicalPrefixedName("worlds-service-worlds"),
@@ -242,7 +240,6 @@ export default class WorldsServiceStack extends Stack {
       });
     }
     
-    this.worldTopic = worldTopic;
     this.worldsTopic = worldsTopic;
   }
 }
