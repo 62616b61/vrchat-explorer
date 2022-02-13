@@ -11,21 +11,18 @@ export default class VRChatAuthServiceStack extends Stack {
     super(scope, service, props);
 
     // DYNAMO
-    const credentialsTable = new Table(this, "vrchat-auth-service-credentials", {
+    const credentialsTable = new Table(this, "vrchat-auth-service-credentials-table", {
+      dynamodbTable: {
+        tableName: this.node.root.logicalPrefixedName("vrchat-auth-service-credentials"),
+        removalPolicy: IS_LOCAL ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
+        pointInTimeRecovery: !IS_LOCAL,
+        timeToLiveAttribute: "TTL",
+      },
       fields: {
         PK: TableFieldType.STRING,
         SK: TableFieldType.STRING,
       },
       primaryIndex: { partitionKey: "PK", sortKey: "SK" },
-      dynamodbTable: {
-        timeToLiveAttribute: "TTL",
-
-        // IF LOCAL TABLE
-        ...( IS_LOCAL && {
-          pointInTimeRecovery: false,
-          removalPolicy: RemovalPolicy.DESTROY
-        }),
-      },
     });
 
     // SSM

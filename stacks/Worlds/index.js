@@ -81,7 +81,12 @@ export default class WorldsServiceStack extends Stack {
     }]);
 
     // DYNAMO
-    const worldsTable = new Table(this, "worlds-service-worlds-v2", {
+    const worldsTable = new Table(this, "worlds-service-worlds-table", {
+      dynamodbTable: {
+        tableName: this.node.root.logicalPrefixedName("worlds-service-worlds"),
+        removalPolicy: IS_LOCAL ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
+        pointInTimeRecovery: !IS_LOCAL,
+      },
       fields: {
         PK: TableFieldType.STRING,
         SK: TableFieldType.STRING,
@@ -99,12 +104,7 @@ export default class WorldsServiceStack extends Stack {
         },
       },
       // Enable DynamoDB stream
-      //stream: StreamViewType.KEYS_ONLY,
-      ...(
-        IS_LOCAL
-          ? { dynamodbTable: { removalPolicy: RemovalPolicy.DESTROY } }
-          : { stream: StreamViewType.KEYS_ONLY }
-      ),
+      ...(!IS_LOCAL && { stream: StreamViewType.KEYS_ONLY }),
     });
 
     // LAMBDAS
