@@ -1,4 +1,4 @@
-import { WorldsMetadata, WorldHistoryMetadata } from "./lib/connections/dynamodb/Worlds";
+import { World, WorldsMetadata } from "./lib/connections/dynamodb/Worlds";
 import { groupBy } from "lodash";
 
 async function handleWorldEvent({ count }) {
@@ -6,7 +6,7 @@ async function handleWorldEvent({ count }) {
     {},
     {
       exists: null,
-      add: { count },
+      add: { totalCount: count },
     },
   );
 }
@@ -14,11 +14,11 @@ async function handleWorldEvent({ count }) {
 async function handleWorldHistoryEvent({ PK, count }) {
   const worldId = PK.split("#")[1];
 
-  return WorldHistoryMetadata.update(
+  return World.update(
     { worldId },
     {
       exists: null,
-      add: { count },
+      add: { historyCount: count },
     },
   );
 }
@@ -54,7 +54,7 @@ export async function handler(event) {
   // WORLD RECORDS
   const worldRecords = event.Records.filter(record => {
     const { PK, SK } = extractPKandSK(record);
-    return PK.startsWith("WORLD#") && SK.startsWith("LATEST");
+    return PK.startsWith("WORLD#") && SK.startsWith("INFO");
   });
 
   for (const { count } of prepareRecords(worldRecords, true)) {

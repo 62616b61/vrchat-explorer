@@ -2,7 +2,7 @@ import * as vrchat from 'vrchat';
 import sleep from 'await-sleep';
 import { parse } from '../lib/connections/sqs';
 import { initializeVRChatSession } from '../lib/vrchat-session-helper';
-import { World } from './lib/connections/dynamodb/Worlds';
+import { table } from './lib/connections/dynamodb/Worlds';
 import { ParsedWorld } from './lib/serializers/ParsedWorld';
 import { processSavedWorld } from './lib/world/process-saved-world';
 import { processUnsavedWorld } from './lib/world/process-unsaved-world';
@@ -24,15 +24,26 @@ async function processMessage(message, retry = 0) {
 
   console.log(`World ${message.id} - start processing`)
 
-  const savedWorld = await World.get({ worldId: message.id });
+  const savedWorldEntities = await table.fetch(
+    ['World', 'WorldHistory'],
+    { PK: `WORLD#${message.id}` },
+    { limit: 2, reverse: true },
+  );
+
+  const worldInfo = savedWorldEntities.World && savedWorldEntities.World[0];
+  const worldHistory = savedWorldEntities.WorldHistory && savedWorldEntities.WorldHistory[0];
 
   try {
     const { data: discoveredWorld } = await WorldsApi.getWorld(message.id);
     const parsedWorld = ParsedWorld(discoveredWorld);
 
-    if (savedWorld && savedWorld.status === "enabled") {
-      return processSavedWorld(parsedWorld, savedWorld);
+    if (worldInfo && worldInfo.status === "enabled") {
+      return processSavedWorld(parsedWorld, worldHistory);
     } else {
+      console.log("World status is disabled. Skipping...")
+    }
+
+    if (!worldInfo && !worldHistory) {
       return processUnsavedWorld(parsedWorld);
     }
   } catch (error) {
