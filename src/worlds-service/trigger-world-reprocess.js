@@ -61,7 +61,6 @@ export async function handler(event) {
     await loadWorlds({ parameters: event });
   } catch (error) {
     console.log(error);
-    console.log(error.response.data);
     throw error;
   }
 
