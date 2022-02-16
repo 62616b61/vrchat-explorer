@@ -17,10 +17,13 @@ const WorldsTableSchema = {
     World: {
       PK:                  { type: String, value: 'WORLD#${worldId}' },
       SK:                  { type: String, value: 'INFO' },
-      GSI1PK:              { type: String, value: 'SCHEDULE#${releaseStatus}#${status}#${schedule}' },
+      GSI1PK:              { type: String, value: 'STATUS#${status}#${releaseStatus}' },
+      GSI1SK:              { type: String, value: 'SCHEDULE#${schedule}' },
 
       worldId:             { type: String, required: true },
+      authorId:            { type: String, required: true },
       status:              { type: String, enum: ['enabled', 'disabled'], required: true, default: 'enabled' },
+      releaseStatus:       { type: String, enum: ['public', 'private', 'hidden'] },
       schedule:            { type: String, enum: ['10m', '1h', '24h'], required: true },
       discoveredAt:        { type: String, required: true },
       historyCount:        { type: Number, default: 0 },

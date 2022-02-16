@@ -15,7 +15,9 @@ export async function processUnsavedWorld(world) {
       // TODO: determine optimal update schedule from available data
       schedule: '24h',
       worldId: world.id,
+      authorId: world.authorId,
       discoveredAt: discoveredAt,
+      releaseStatus: world.releaseStatus,
     },
     { batch },
   );
