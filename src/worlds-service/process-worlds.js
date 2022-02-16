@@ -7,11 +7,13 @@ import { ParsedWorld } from './lib/serializers/ParsedWorld';
 import { processSavedWorld } from './lib/world/process-saved-world';
 import { processUnsavedWorld } from './lib/world/process-unsaved-world';
 
+const MAX_RETRY_COUNT = 5;
+
 const WorldsApi = new vrchat.WorldsApi();
 
 async function processMessage(message, retry = 0) {
-  if (retry > 3) {
-    console.log('Retried 3 times. Dropping message.');
+  if (retry > MAX_RETRY_COUNT) {
+    console.log(`Retried ${MAX_RETRY_COUNT} times. Dropping message: ${message.id}`);
     return;
   }
 
@@ -59,12 +61,17 @@ async function processMessage(message, retry = 0) {
       // error.response = status: 429, statusText: 'Too Many Requests',
       // error.response.data = { error: 'slow down', status_code: 429 }
       if (error.response.status === 429) {
-        console.log("Too many requests");
+        console.log("429 Too many requests");
         return processMessage(message, retry + 1);
       }
 
       if (error.response.status === 502) {
-        console.log("Bad Gateway");
+        console.log("502 Bad Gateway");
+        return processMessage(message, retry + 1);
+      }
+
+      if (error.response.status === 520) {
+        console.log("520 Origin Error (CF)");
         return processMessage(message, retry + 1);
       }
     }
