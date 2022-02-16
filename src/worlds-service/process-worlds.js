@@ -37,10 +37,12 @@ async function processMessage(message, retry = 0) {
     const { data: discoveredWorld } = await WorldsApi.getWorld(message.id);
     const parsedWorld = ParsedWorld(discoveredWorld);
 
-    if (worldInfo && worldInfo.status === "enabled") {
-      return processSavedWorld(parsedWorld, worldHistory);
-    } else {
-      console.log("World status is disabled. Skipping...")
+    if (worldInfo) {
+      if (worldInfo.status === "enabled") {
+        return processSavedWorld(parsedWorld, worldHistory);
+      } else {
+        console.log("World status is disabled. Skipping...")
+      }
     }
 
     if (!worldInfo && !worldHistory) {

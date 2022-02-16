@@ -32,7 +32,7 @@ const WorldsTableSchema = {
 
       historyId:           { type: String, generate: 'ulid' },
       hash:                { type: String, required: true },
-      delta:               { type: Array },
+      delta:               { type: Set },
 
       worldId:             { type: String, required: true },
       authorId:            { type: String, required: true },
@@ -42,8 +42,8 @@ const WorldsTableSchema = {
 
       favorites:           { type: Number, required: true },
       heat:                { type: Number, required: true },
-      tags:                { type: Array,  required: true },
-      unityPackages:       { type: Array, required: true },
+      tags:                { type: Set,    required: true },
+      unityPackages:       { type: Array,  required: true },
       name:                { type: String, required: true },
 
       description:         { type: String, required: true },

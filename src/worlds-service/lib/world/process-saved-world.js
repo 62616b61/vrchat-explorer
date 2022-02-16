@@ -10,14 +10,14 @@ export async function processSavedWorld(world, savedWorld) {
   const hashHasChanged = !isEqual(worldHash, savedWorld.hash);
 
   if (hashHasChanged) {
-    const worldDelta = calculateWorldDelta(world, savedWorld);
+    const worldDeltaSet = calculateWorldDelta(world, savedWorld);
     const discoveredAt = new Date().toISOString();
 
-    console.log(`World ${world.id} - hash changed (delta: ${worldDelta})`);
+    console.log(`World ${world.id} - hash changed (delta: ${Array.from(worldDeltaSet)})`);
 
     await WorldHistory.create(
       {
-        delta: worldDelta,
+        delta: worldDeltaSet,
 
         hash: worldHash,
         worldId: world.id,
@@ -46,7 +46,7 @@ export async function processSavedWorld(world, savedWorld) {
       },
     );
 
-    await publishWorldUpdate(world, worldHash, worldDelta);
+    await publishWorldUpdate(world, worldHash, worldDeltaSet);
   }
 
   return publishWorldStatistics(world);
